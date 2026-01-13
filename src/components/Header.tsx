@@ -15,11 +15,11 @@ const Header: React.FC = () => {
 
   return (
     <header className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-8 py-4">
 
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 sm:gap-3 transition duration-300 ease-in-out hover:scale-[1.05] group">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 transition duration-300 ease-in-out hover:scale-[1.05] group -ml-1 sm:-ml-2">
           <NavbarLogo className="h-14 w-14 sm:h-16 sm:w-16" />
           <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white group-hover:text-primary dark:group-hover:text-blue-400 transition">MedAIx</span>
         </Link>
@@ -151,15 +151,12 @@ const Header: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="hidden sm:flex gap-2">
-              <Link to="/login" className="text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:text-primary-600 dark:hover:text-primary-400">
-                Login
-              </Link>
+            <div className="hidden sm:flex">
               <Link
                 to="/signup"
                 className="rounded-lg bg-primary-600 px-3 sm:px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-700"
               >
-                Sign Up
+                Register
               </Link>
             </div>
           )}
@@ -208,11 +205,12 @@ const Header: React.FC = () => {
             </>
           ) : (
             <>
-              <Link to="/login" onClick={() => setShowMobileMenu(false)} className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition">
-                Login
-              </Link>
-              <Link to="/signup" onClick={() => setShowMobileMenu(false)} className="block px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition">
-                Sign Up
+              <Link 
+                to="/signup" 
+                onClick={() => setShowMobileMenu(false)} 
+                className="block px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition"
+              >
+                Register
               </Link>
             </>
           )}

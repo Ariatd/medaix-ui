@@ -53,30 +53,6 @@ const Landing: React.FC = () => {
           {/* Left - Text */}
           <span className="text-xl font-bold text-white">MedAIx</span>
           
-          {/* Center - MX Logo Icon */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
-            <svg viewBox="0 0 64 64" width={40} height={40} className="drop-shadow-lg">
-              <defs>
-                <linearGradient id="medaixGradientHeader" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ffffff" />
-                  <stop offset="100%" stopColor="#E6F2FF" />
-                </linearGradient>
-              </defs>
-              
-              {/* Background circle */}
-              <circle cx="32" cy="32" r="30" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5" />
-              
-              {/* Medical Cross */}
-              <g>
-                <line x1="32" y1="16" x2="32" y2="48" stroke="url(#medaixGradientHeader)" strokeWidth="4" strokeLinecap="round" />
-                <line x1="18" y1="32" x2="46" y2="32" stroke="url(#medaixGradientHeader)" strokeWidth="4" strokeLinecap="round" />
-              </g>
-              
-              {/* M and X simplified */}
-              <text x="32" y="44" fontSize="10" fontFamily="Poppins, Arial, sans-serif" fontWeight="700" fill="rgba(255,255,255,0.8)" textAnchor="middle">MX</text>
-            </svg>
-          </div>
-          
           {/* Right - Buttons */}
           <div className="flex gap-3">
             <Link 
