@@ -71,13 +71,6 @@ const Profile: React.FC = () => {
       })
     : 'N/A';
 
-  // Mock statistics
-  const stats = {
-    totalAnalyses: 24,
-    successRate: 98,
-    lastAnalysisDate: '2025-12-10',
-  };
-
   // Mock recent analyses
   const recentAnalyses = [
     { id: 1, type: 'Brain MRI', date: '2025-12-10', confidence: 87 },
@@ -282,22 +275,30 @@ const Profile: React.FC = () => {
                 )}
               </div>
 
-              {/* Statistics Cards - Responsive */}
+              {/* User Info Cards - Responsive */}
               <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-3">
                 <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-                  <div className="text-2xl sm:text-3xl font-bold text-primary">{stats.totalAnalyses}</div>
-                  <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">Total Analyses</p>
+                  <p className="text-xs font-semibold text-gray-600 uppercase">Account Type</p>
+                  <p className="mt-1 text-lg sm:text-xl font-bold text-primary">Researcher</p>
                 </div>
 
                 <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-                  <div className="text-2xl sm:text-3xl font-bold text-success">{stats.successRate}%</div>
-                  <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">Success Rate</p>
+                  <p className="text-xs font-semibold text-gray-600 uppercase">Institution</p>
+                  <p className="mt-1 text-lg sm:text-xl font-bold text-gray-800">TED University</p>
                 </div>
 
                 <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
-                  <div className="text-sm sm:text-lg font-bold text-gray-800">{stats.lastAnalysisDate}</div>
-                  <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">Last Analysis</p>
+                  <p className="text-xs font-semibold text-gray-600 uppercase">Member Since</p>
+                  <p className="mt-1 text-sm sm:text-lg font-bold text-gray-800">{memberSinceDate}</p>
                 </div>
+              </div>
+
+              {/* Additional Info */}
+              <div className="rounded-lg bg-white p-4 sm:p-6 shadow-md">
+                <p className="text-xs font-semibold text-gray-600 uppercase">Department</p>
+                <p className="mt-1 text-sm sm:text-base font-medium text-gray-800">Software Engineering</p>
+                <p className="mt-3 sm:mt-4 text-xs font-semibold text-gray-600 uppercase">Research Focus</p>
+                <p className="mt-1 text-sm sm:text-base font-medium text-gray-800">Medical Image Analysis</p>
               </div>
 
               {/* Recent Analyses - Responsive */}
