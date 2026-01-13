@@ -1,0 +1,69 @@
+/* Tailwind CSS v3 directives - these are valid and required */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import './styles/platform.css';
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Logo contrast enhancements for auth pages */
+.logo-contrast-enhanced svg {
+  stroke: #FFFFFF !important;
+  stroke-width: 1.5px !important;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.45)) !important;
+}
+
+/* Ensure logo text has white stroke for visibility on dark backgrounds */
+.logo-contrast-enhanced text {
+  stroke: #FFFFFF !important;
+  stroke-width: 0.8px !important;
+}
+
+/* Enhanced drop shadow for logo elements */
+.logo-contrast-enhanced circle,
+.logo-contrast-enhanced line,
+.logo-contrast-enhanced path {
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)) !important;
+}
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #333333;
+  background-color: #F5F5F5;
+}
+
+body {
+  @apply bg-background text-[#333333] antialiased;
+}
+
+/* Ensure full-bleed layout and no default browser gaps */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+a {
+  @apply text-primary transition duration-300 ease-in-out;
+}
+
+a:hover {
+  @apply text-primary-600;
+}
+/* Animations */
+@keyframes fade-in-down {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in-down {
+    animation: fade-in-down 0.3s ease-out;
+  }

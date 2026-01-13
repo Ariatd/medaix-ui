@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /private
+
+# Allow search engines to index
+Allow: /documentation
+Allow: /
+
+# Crawl delay to prevent server overload
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://medaix.ai/sitemap.xml
