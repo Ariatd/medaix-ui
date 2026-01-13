@@ -110,6 +110,15 @@ const Landing: React.FC = () => {
               Powered by advanced AI algorithms that provide accurate, instant medical image analysis with confidence metrics you can trust.
             </motion.p>
 
+            {/* Honest Subtitle */}
+            <motion.p
+              variants={fadeInUp}
+              transition={{ ...easeConfig, delay: staggerDelay * 1.5 }}
+              className="mb-8 text-sm sm:text-base text-gray-500 dark:text-gray-400 max-w-2xl mx-auto"
+            >
+              A Senior Capstone Project - TED University 2025-2026
+            </motion.p>
+
             {/* Hero Button */}
             <motion.div
               variants={fadeInScale}
@@ -144,9 +153,9 @@ const Landing: React.FC = () => {
               className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6"
             >
               {[
-                { label: '< 1s', description: 'Analysis Time' },
-                { label: '99.2%', description: 'Accuracy Rate' },
-                { label: 'HIPAA', description: 'Compliant' },
+                { label: '< 2s', description: 'Analysis Time' },
+                { label: '4+', description: 'Image Formats' },
+                { label: 'Secure', description: 'HIPAA Ready' },
               ].map((stat, idx) => (
                 <motion.div
                   key={idx}
