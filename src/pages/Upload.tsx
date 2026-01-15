@@ -21,7 +21,7 @@ const Upload: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-1 flex-col items-center justify-center bg-background px-4 sm:px-6 py-8 sm:py-12">
+      <div className="flex flex-1 flex-col items-center justify-center min-h-screen bg-[#f7f8fa] dark:bg-[#071029] text-gray-900 dark:text-gray-100 ring-1 ring-black/5 dark:ring-white/6 px-4 sm:px-6 py-8 sm:py-12">
         <div className="w-full max-w-4xl">
           {/* Success Message */}
           {successMessage && (
@@ -45,21 +45,21 @@ const Upload: React.FC = () => {
 
           {/* Header - Responsive */}
           <div className="mb-6 sm:mb-8 text-center">
-            <h1 className="mb-2 text-2xl sm:text-3xl lg:text-4xl font-bold text-[#333333]">
+            <h1 className="mb-2 text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
               Medical Image Analysis
             </h1>
-            <p className="text-sm sm:text-base lg:text-lg text-[#666666] px-4">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 px-4">
               Upload your medical imaging files for AI-powered analysis
             </p>
           </div>
 
           {/* Upload Card - Responsive */}
-          <div className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-md transition duration-300 ease-in-out hover:shadow-lg">
+          <div className="rounded-xl bg-white dark:bg-gray-800/80 p-4 sm:p-6 lg:p-8 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 transition duration-300 ease-in-out hover:shadow-2xl">
             <UploadCard onAnalysisComplete={handleAnalysisComplete} />
           </div>
 
           {/* Important Notice - Responsive */}
-          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start gap-3 rounded-lg bg-warning-50 p-4 text-[#333333] shadow-sm" role="alert">
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-start gap-3 rounded-lg bg-yellow-900/80 p-4 text-yellow-200 shadow-sm ring-1 ring-yellow-900/40" role="alert">
             <svg
               className="h-6 w-6 flex-shrink-0 text-warning self-start mt-0.5"
               fill="none"
@@ -74,7 +74,7 @@ const Upload: React.FC = () => {
               />
             </svg>
             <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm text-[#333333]">
+              <p className="text-xs sm:text-sm text-yellow-100">
                 <strong className="font-semibold">Important Notice:</strong> This tool is for research and educational purposes only. 
                 Results are not a clinical diagnosis and should not be used as a substitute for professional medical advice.
               </p>
@@ -84,46 +84,46 @@ const Upload: React.FC = () => {
           {/* Additional Information - Responsive */}
           <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Supported Formats */}
-            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-800/70 rounded-lg p-4 sm:p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-sm sm:text-base font-semibold text-gray-800">Supported Formats</h3>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-100">Supported Formats</h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-300">
                 DICOM, JPEG, PNG, TIFF files up to 50MB
               </p>
             </div>
 
             {/* Image Types */}
-            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-800/70 rounded-lg p-4 sm:p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </div>
-                <h3 className="text-sm sm:text-base font-semibold text-gray-800">Image Types</h3>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-100">Image Types</h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-300">
                 X-rays, MRI, CT scans, ultrasound images
               </p>
             </div>
 
             {/* Processing Time */}
-            <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm border border-gray-100 sm:col-span-2 lg:col-span-1">
+            <div className="bg-white dark:bg-gray-800/70 rounded-lg p-4 sm:p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 sm:col-span-2 lg:col-span-1">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-sm sm:text-base font-semibold text-gray-800">Processing Time</h3>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-100">Processing Time</h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-300">
                 Usually 30-60 seconds depending on file size
               </p>
             </div>

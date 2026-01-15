@@ -84,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-900 z-40 transition-transform ${
+        className={`fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-900 z-40 transition-transform border-r border-gray-200 dark:border-transparent ${
           isSmall ? (isOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0 relative'
         } pt-16 overflow-y-auto ${className}`}
       >
@@ -131,28 +131,54 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
 
         {/* Bottom Actions */}
         <div className="p-4 space-y-2">
-          <Link
-            to="/profile"
-            onClick={() => isSmall && setIsOpen(false)}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span>Profile</span>
-          </Link>
-          <button
-            onClick={() => {
-              logout();
-              isSmall && setIsOpen(false);
-            }}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition text-sm"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span>Logout</span>
-          </button>
+          {(() => {
+            const targets = ['/profile', '/dashboard', '/upload', '/history', '/settings'];
+            const inTarget = targets.includes(location.pathname) || location.pathname.startsWith('/results');
+
+            if (inTarget) {
+              return (
+                <button
+                  onClick={() => {
+                    logout();
+                    isSmall && setIsOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition text-sm"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Logout</span>
+                </button>
+              );
+            }
+
+            return (
+              <>
+                <Link
+                  to="/profile"
+                  onClick={() => isSmall && setIsOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span>Profile</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    isSmall && setIsOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition text-sm"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Logout</span>
+                </button>
+              </>
+            );
+          })()}
         </div>
       </aside>
 

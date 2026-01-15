@@ -139,11 +139,11 @@ const History: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="bg-background px-4 sm:px-6 py-8 sm:py-12">
+      <div className="min-h-screen bg-[#f7f8fa] dark:bg-[#071029] text-gray-900 dark:text-gray-100 ring-1 ring-black/5 dark:ring-white/6 px-4 sm:px-6 py-8 sm:py-12">
         <div className="mx-auto max-w-7xl">
           {allAnalyses.length === 0 ? (
             // Empty State for new users - Responsive
-            <div className="min-h-[60vh] flex flex-col items-center justify-center rounded-xl bg-white py-12 sm:py-20 shadow-md px-4">
+            <div className="min-h-[60vh] flex flex-col items-center justify-center rounded-xl bg-gray-800/80 py-12 sm:py-20 shadow-lg ring-1 ring-white/6 px-4">
               <svg
                 className="mb-6 h-16 w-16 sm:h-24 sm:w-24 text-gray-300"
                 fill="none"
@@ -157,8 +157,8 @@ const History: React.FC = () => {
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <h2 className="mb-2 text-xl sm:text-2xl font-bold text-gray-800">No Analysis History Yet</h2>
-              <p className="mb-8 text-center text-gray-600 max-w-sm text-sm sm:text-base">
+              <h2 className="mb-2 text-xl sm:text-2xl font-bold text-gray-100">No Analysis History Yet</h2>
+              <p className="mb-8 text-center text-gray-300 max-w-sm text-sm sm:text-base">
                 Upload and analyze your first medical image to start building your analysis history
               </p>
               <Link
@@ -204,36 +204,36 @@ const History: React.FC = () => {
               )}
 
               {/* Filters Section - Responsive */}
-              <div className="mb-6 sm:mb-8 rounded-xl bg-white p-4 sm:p-6 shadow-md">
-                <h2 className="mb-4 text-base sm:text-lg font-bold text-[#333333]">Filters</h2>
+              <div className="mb-6 sm:mb-8 rounded-xl bg-white dark:bg-gray-800/80 p-4 sm:p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
+                <h2 className="mb-4 text-base sm:text-lg font-bold text-gray-100">Filters</h2>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                   {/* Search */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-700">Search</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-300">Search</label>
                     <input
                       type="text"
                       placeholder="File name or ID..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base"
+                      className="w-full rounded-lg border border-gray-600 bg-gray-900/40 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-100"
                     />
                   </div>
 
                   {/* Start Date */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-700">Start Date</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-300">Start Date</label>
                     <input
                       type="date"
                       value={filters.startDate}
                       onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base"
+                      className="w-full rounded-lg border border-gray-600 bg-gray-900/40 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-100"
                     />
                   </div>
 
                   {/* End Date */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-700">End Date</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-300">End Date</label>
                     <input
                       type="date"
                       value={filters.endDate}
@@ -244,7 +244,7 @@ const History: React.FC = () => {
 
                   {/* Status */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-700">Status</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-300">Status</label>
                     <select
                       value={filters.status}
                       onChange={(e) => setFilters({ ...filters, status: e.target.value })}
@@ -261,7 +261,7 @@ const History: React.FC = () => {
 
                   {/* Sort */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-700">Sort By</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-300">Sort By</label>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
@@ -289,31 +289,31 @@ const History: React.FC = () => {
               </div>
 
               {/* Results Count */}
-              <div className="mb-4 text-xs sm:text-sm text-gray-600">
+              <div className="mb-4 text-xs sm:text-sm text-gray-300">
                 Showing <span className="font-semibold">{paginatedAnalyses.length}</span> of{' '}
                 <span className="font-semibold">{filteredAnalyses.length}</span> analyses
               </div>
 
               {/* Table - Responsive */}
               {paginatedAnalyses.length > 0 ? (
-                <div className="rounded-xl bg-white shadow-md overflow-hidden">
+                <div className="rounded-xl bg-white dark:bg-gray-800/80 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                   {/* Mobile Card View */}
                   <div className="block lg:hidden">
                     {paginatedAnalyses.map((analysis) => (
-                      <div key={analysis.id} className="border-b border-gray-100 p-4 sm:p-6 last:border-b-0">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-gray-800 text-sm sm:text-base truncate">{analysis.image?.fileName || 'Unknown'}</h3>
-                            <p className="text-xs sm:text-sm text-gray-600">{new Date(analysis.createdAt).toLocaleString()}</p>
+                      <div key={analysis.id} className="border-b border-gray-700 bg-gray-800/60 p-4 sm:p-6 last:border-b-0">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-gray-100 text-sm sm:text-base truncate">{analysis.image?.fileName || 'Unknown'}</h3>
+                              <p className="text-xs sm:text-sm text-gray-300">{new Date(analysis.createdAt).toLocaleString()}</p>
+                            </div>
+                            <span className={`inline-block rounded-full px-2 sm:px-3 py-1 text-xs font-semibold ${getStatusColor(analysis.status)}`}>
+                              {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
+                            </span>
                           </div>
-                          <span className={`inline-block rounded-full px-2 sm:px-3 py-1 text-xs font-semibold ${getStatusColor(analysis.status)}`}>
-                            {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="inline-block rounded-full bg-blue-50 px-2 sm:px-3 py-1 text-xs font-semibold text-blue-700">
-                            {analysis.image?.imageType || 'Unknown'}
-                          </span>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="inline-block rounded-full bg-blue-900/30 px-2 sm:px-3 py-1 text-xs font-semibold text-blue-300">
+                              {analysis.image?.imageType || 'Unknown'}
+                            </span>
                           {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null ? (
                             (() => {
                               const pct = toPercent(analysis.confidenceScore) || 0;
@@ -331,7 +331,7 @@ const History: React.FC = () => {
                           <Link
                             to={`/results/${analysis.id}`}
                             title="View details"
-                            className="rounded-lg bg-primary-50 p-2 text-primary transition hover:bg-primary hover:text-white"
+                            className="rounded-lg bg-primary-900/30 p-2 text-primary transition hover:bg-primary hover:text-white"
                           >
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -341,7 +341,7 @@ const History: React.FC = () => {
                           <button
                             onClick={() => handleDelete(analysis.id)}
                             title="Delete"
-                            className="rounded-lg bg-danger-50 p-2 text-danger transition hover:bg-danger hover:text-white"
+                            className="rounded-lg bg-red-900/30 p-2 text-red-400 transition hover:bg-red-600 hover:text-white"
                           >
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -355,27 +355,27 @@ const History: React.FC = () => {
                   {/* Desktop Table View */}
                   <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-gray-50 border-b border-gray-200">
+                      <thead className="bg-gray-800/60 border-b border-gray-700">
                         <tr>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Date</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">File Name</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Image Type</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Confidence</th>
-                          <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Actions</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Date</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">File Name</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Image Type</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Status</th>
+                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Confidence</th>
+                          <th className="px-6 py-4 text-center text-sm font-semibold text-gray-200">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {paginatedAnalyses.map((analysis) => (
-                          <tr key={analysis.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
-                            <td className="px-6 py-4 text-sm text-gray-700">
+                          <tr key={analysis.id} className="border-b border-gray-700 hover:bg-gray-800/60 transition">
+                            <td className="px-6 py-4 text-sm text-gray-300">
                               {new Date(analysis.createdAt).toLocaleString()}
                             </td>
-                            <td className="px-6 py-4 text-sm font-medium text-gray-800">
+                            <td className="px-6 py-4 text-sm font-medium text-gray-100">
                               {analysis.image?.fileName || 'Unknown'}
                             </td>
                             <td className="px-6 py-4 text-sm">
-                              <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                              <span className="inline-block rounded-full bg-blue-900/30 px-3 py-1 text-xs font-semibold text-blue-300">
                                 {analysis.image?.imageType || 'Unknown'}
                               </span>
                             </td>
@@ -395,7 +395,7 @@ const History: React.FC = () => {
                                   );
                                 })()
                               ) : (
-                                <span className="text-gray-500">-</span>
+                                <span className="text-gray-400">-</span>
                               )}
                             </td>
                             <td className="px-6 py-4 text-center">
@@ -403,7 +403,7 @@ const History: React.FC = () => {
                                 <Link
                                   to={`/results/${analysis.id}`}
                                   title="View details"
-                                  className="rounded-lg bg-primary-50 p-2 text-primary transition hover:bg-primary hover:text-white"
+                                  className="rounded-lg bg-primary-900/30 p-2 text-primary transition hover:bg-primary hover:text-white"
                                 >
                                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -413,7 +413,7 @@ const History: React.FC = () => {
                                 <button
                                   onClick={() => handleDelete(analysis.id)}
                                   title="Delete"
-                                  className="rounded-lg bg-danger-50 p-2 text-danger transition hover:bg-danger hover:text-white"
+                                  className="rounded-lg bg-red-900/30 p-2 text-red-400 transition hover:bg-red-600 hover:text-white"
                                 >
                                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -429,11 +429,11 @@ const History: React.FC = () => {
 
                   {/* Pagination - Responsive */}
                   {totalPages > 1 && (
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-0 border-t border-gray-200 bg-gray-50 px-4 sm:px-6 py-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-0 border-t border-gray-700 bg-gray-800/60 px-4 sm:px-6 py-4">
                       <button
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="rounded-lg border border-gray-300 px-3 py-1 text-sm font-semibold transition hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1"
+                        className="rounded-lg border border-gray-600 px-3 py-1 text-sm font-semibold transition hover:bg-gray-700/40 disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1"
                       >
                         ← Previous
                       </button>
@@ -446,7 +446,7 @@ const History: React.FC = () => {
                             className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${
                               currentPage === page
                                 ? 'bg-primary text-white'
-                                : 'border border-gray-300 hover:bg-gray-100'
+                                : 'border border-gray-600 hover:bg-gray-700/40'
                             }`}
                           >
                             {page}
@@ -457,7 +457,7 @@ const History: React.FC = () => {
                       <button
                         onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        className="rounded-lg border border-gray-300 px-3 py-1 text-sm font-semibold transition hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed order-3 sm:order-3"
+                        className="rounded-lg border border-gray-600 px-3 py-1 text-sm font-semibold transition hover:bg-gray-700/40 disabled:opacity-50 disabled:cursor-not-allowed order-3 sm:order-3"
                       >
                         Next →
                       </button>
@@ -465,7 +465,7 @@ const History: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <div className="min-h-[40vh] flex flex-col items-center justify-center rounded-xl bg-white py-12 shadow-md">
+                <div className="min-h-[40vh] flex flex-col items-center justify-center rounded-xl bg-white dark:bg-gray-800/80 py-12 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
                   <svg className="mb-4 h-12 w-12 sm:h-16 sm:w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -489,22 +489,22 @@ const History: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 sm:p-8 shadow-xl">
-            <h3 className="mb-2 text-xl sm:text-2xl font-bold text-[#333333]">Delete Analysis?</h3>
-            <p className="mb-6 text-sm sm:text-base text-gray-600">
+          <div className="w-full max-w-md rounded-xl bg-gray-800/90 p-6 sm:p-8 shadow-2xl ring-1 ring-white/6">
+            <h3 className="mb-2 text-xl sm:text-2xl font-bold text-gray-100">Delete Analysis?</h3>
+            <p className="mb-6 text-sm sm:text-base text-gray-300">
               Are you sure you want to delete this analysis? This action cannot be undone.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="flex-1 rounded-lg border-2 border-gray-300 px-4 py-2 font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="flex-1 rounded-lg border-2 border-gray-600 px-4 py-2 font-semibold text-gray-200 transition hover:bg-gray-700/40"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="flex-1 rounded-lg bg-danger px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+                className="flex-1 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
               >
                 Delete
               </button>

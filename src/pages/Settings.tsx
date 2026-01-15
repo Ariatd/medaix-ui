@@ -121,7 +121,7 @@ const Settings: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-background-50 dark:bg-gray-900 py-6 sm:py-8">
+      <div className="min-h-screen bg-[#f7f8fa] dark:bg-[#071029] text-gray-900 dark:text-gray-100 ring-1 ring-black/5 dark:ring-white/6 py-6 sm:py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           {/* Header - Responsive */}
           <div className="mb-6 sm:mb-8">

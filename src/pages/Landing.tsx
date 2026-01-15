@@ -52,7 +52,33 @@ const Landing: React.FC = () => {
         <header className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-primary-600 to-blue-700 relative">
           {/* Left - Text */}
           <span className="text-xl font-bold text-white">MedAIx</span>
-          
+
+          {/* Center - Inline Links (Account, Upload, Dashboard, Documentation) */}
+          <nav className="flex-1 flex justify-center">
+            <ul className="flex gap-12">
+              <li>
+                <Link to="/profile" className="text-white text-sm">
+                  Account
+                </Link>
+              </li>
+              <li>
+                <Link to="/upload" className="text-white text-sm">
+                  Upload
+                </Link>
+              </li>
+              <li>
+                <Link to="/dashboard" className="text-white text-sm">
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link to="/documentation" className="text-white text-sm">
+                  Documentation
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
           {/* Right - Buttons */}
           <div className="flex gap-3">
             <Link 
@@ -69,6 +95,8 @@ const Landing: React.FC = () => {
             </Link>
           </div>
         </header>
+
+        
 
         {/* SECTION 1: Hero */}
         <motion.section
@@ -153,7 +181,7 @@ const Landing: React.FC = () => {
               className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6"
             >
               {[
-                { label: '< 2s', description: 'Analysis Time' },
+                { label: '< 10s', description: 'Analysis Time' },
                 { label: '4+', description: 'Image Formats' },
                 { label: 'Secure', description: 'HIPAA Ready' },
               ].map((stat, idx) => (

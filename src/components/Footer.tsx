@@ -26,13 +26,13 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition">
-                  Home
+                <Link to="/profile" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition">
+                  Account
                 </Link>
               </li>
               <li>
-                <Link to="/documentation" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition">
-                  Documentation
+                <Link to="/upload" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition">
+                  Upload
                 </Link>
               </li>
               <li>
@@ -41,8 +41,8 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/upload" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition">
-                  Upload
+                <Link to="/documentation" className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition">
+                  Documentation
                 </Link>
               </li>
             </ul>
@@ -113,7 +113,7 @@ const Footer: React.FC = () => {
               © {currentYear} MedAIx (Medical Analysis eXpert). All rights reserved.
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-500">
-              Made with ❤️ by the MedAIx Team
+              Made with by the MedAIx Team
             </p>
           </div>
 

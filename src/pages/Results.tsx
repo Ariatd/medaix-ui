@@ -65,10 +65,10 @@ const Results: React.FC = () => {
     fetchAnalysis();
   }, [id, navigationData]);
 
-  if (loading) {
+    if (loading) {
     return (
       <DashboardLayout>
-        <div className="flex min-h-[calc(100vh-300px)] items-center justify-center bg-background px-4 sm:px-6">
+        <div className="flex min-h-[calc(100vh-300px)] items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-neutral-900 to-black text-gray-100 px-4 sm:px-6">
           <LoadingAnimation message="Loading results..." />
         </div>
       </DashboardLayout>
@@ -78,7 +78,7 @@ const Results: React.FC = () => {
   if (error || !analysis) {
     return (
       <DashboardLayout>
-        <div className="flex min-h-[calc(100vh-300px)] items-center justify-center bg-background px-4 sm:px-6">
+        <div className="flex min-h-[calc(100vh-300px)] items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-neutral-900 to-black text-gray-100 px-4 sm:px-6">
           <div className="w-full max-w-md">
             <ErrorAlert message={error || 'Analysis not found'} onClose={() => navigate('/history')} />
             <button
@@ -95,15 +95,15 @@ const Results: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="bg-background px-4 sm:px-6 py-6 sm:py-8">
+      <div className="min-h-screen bg-[#f7f8fa] dark:bg-[#071029] text-gray-900 dark:text-gray-100 ring-1 ring-black/5 dark:ring-white/6 px-4 sm:px-6 py-6 sm:py-8">
         <div className="mx-auto max-w-7xl">
           {/* Header - Responsive */}
           <div className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <h1 className="mb-2 text-xl sm:text-2xl lg:text-4xl font-bold text-[#333333]">Analysis Results</h1>
-                <p className="text-sm sm:text-base lg:text-lg text-[#666666] truncate">{analysis.image?.fileName || 'Unknown file'}</p>
-                <p className="text-xs text-gray-500 mt-1">ID: {analysis.id.substring(0, 12)}...</p>
+                <h1 className="mb-2 text-xl sm:text-2xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">Analysis Results</h1>
+                <p className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 truncate">{analysis.image?.fileName || 'Unknown file'}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">ID: {analysis.id.substring(0, 12)}...</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                 <Link
@@ -140,19 +140,19 @@ const Results: React.FC = () => {
           )}
 
           {/* Status Banner - Responsive */}
-          <div className="mb-6 sm:mb-8 rounded-lg border-2 border-success bg-success-50 p-4 sm:p-6 shadow-md">
+          <div className="mb-6 sm:mb-8 rounded-lg border-2 border-green-700 bg-green-900/30 p-4 sm:p-6 shadow-lg">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-success">{analysis.image?.imageType || 'Unknown'} Image</h2>
-                <p className="mt-1 text-sm sm:text-base text-gray-700">Status: {analysis.status}</p>
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-green-800 dark:text-green-300">{analysis.image?.imageType || 'Unknown'} Image</h2>
+                <p className="mt-1 text-sm sm:text-base text-gray-900 dark:text-gray-300">Status: {analysis.status}</p>
               </div>
               <div className="text-center sm:text-right">
-                <div className="text-2xl sm:text-3xl lg:text-5xl font-bold text-success">
+                <div className="text-2xl sm:text-3xl lg:text-5xl font-bold text-green-800 dark:text-green-300">
                   {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
                     ? formatPercent(analysis.confidenceScore)
                     : 'N/A'}
                 </div>
-                <p className="text-xs sm:text-sm text-gray-600">Confidence</p>
+                <p className="text-xs sm:text-sm text-gray-900 dark:text-gray-400">Confidence</p>
               </div>
             </div>
           </div>
@@ -162,31 +162,31 @@ const Results: React.FC = () => {
             {/* Left Column */}
             <div className="lg:col-span-2 space-y-6 sm:space-y-8">
               {/* File Information - Responsive */}
-              <div className="overflow-hidden rounded-lg bg-white shadow-md">
-                <div className="border-b border-gray-200 bg-gray-50 px-4 sm:px-6 py-3 sm:py-4">
-                  <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-800">Image Information</h3>
+              <div className="overflow-hidden rounded-lg bg-gray-800/80 shadow-lg ring-1 ring-white/6">
+                <div className="border-b border-gray-700 bg-gray-900/60 px-4 sm:px-6 py-3 sm:py-4">
+                  <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-100">Image Information</h3>
                 </div>
                 <div className="p-4 sm:p-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
-                      <p className="text-xs sm:text-sm font-semibold text-gray-600">File Name</p>
-                      <p className="mt-1 sm:mt-2 font-medium text-gray-800 break-all text-xs sm:text-sm">{analysis.image?.fileName || 'Unknown'}</p>
+                      <p className="text-xs sm:text-sm font-semibold text-gray-300">File Name</p>
+                      <p className="mt-1 sm:mt-2 font-medium text-gray-100 break-all text-xs sm:text-sm">{analysis.image?.fileName || 'Unknown'}</p>
                     </div>
                     <div>
-                      <p className="text-xs sm:text-sm font-semibold text-gray-600">Image Type</p>
-                      <span className="mt-1 sm:mt-2 inline-block rounded-full bg-blue-50 px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold text-blue-700">
+                      <p className="text-xs sm:text-sm font-semibold text-gray-300">Image Type</p>
+                      <span className="mt-1 sm:mt-2 inline-block rounded-full bg-blue-900/30 px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold text-blue-300">
                         {analysis.image?.imageType || 'Unknown'}
                       </span>
                     </div>
                     <div>
-                      <p className="text-xs sm:text-sm font-semibold text-gray-600">Upload Date</p>
-                      <p className="mt-1 sm:mt-2 font-medium text-gray-800 text-xs sm:text-sm">
+                      <p className="text-xs sm:text-sm font-semibold text-gray-300">Upload Date</p>
+                      <p className="mt-1 sm:mt-2 font-medium text-gray-100 text-xs sm:text-sm">
                         {new Date(analysis.createdAt).toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs sm:text-sm font-semibold text-gray-600">File Size</p>
-                      <p className="mt-1 sm:mt-2 font-medium text-gray-800 text-xs sm:text-sm">
+                      <p className="text-xs sm:text-sm font-semibold text-gray-300">File Size</p>
+                      <p className="mt-1 sm:mt-2 font-medium text-gray-100 text-xs sm:text-sm">
                         Unknown
                       </p>
                     </div>
@@ -195,19 +195,19 @@ const Results: React.FC = () => {
               </div>
 
               {/* Analysis Findings - Responsive */}
-              <div className="overflow-hidden rounded-lg bg-white shadow-md">
-                <div className="border-b border-gray-200 bg-gray-50 px-4 sm:px-6 py-3 sm:py-4">
-                  <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-800">Analysis Findings</h3>
+              <div className="overflow-hidden rounded-lg bg-gray-800/80 shadow-lg ring-1 ring-white/6">
+                <div className="border-b border-gray-700 bg-gray-900/60 px-4 sm:px-6 py-3 sm:py-4">
+                  <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-100">Analysis Findings</h3>
                 </div>
                 <div className="p-4 sm:p-6">
                   {analysis.findings && analysis.findings.length > 0 ? (
                     <div className="space-y-4">
                       {analysis.findings.map((finding, idx) => (
-                        <div key={idx} className="rounded-lg border border-gray-200 p-3 sm:p-4">
+                        <div key={idx} className="rounded-lg border border-gray-700 bg-gray-800/60 p-3 sm:p-4">
                           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-gray-800 text-xs sm:text-sm">{finding.description}</h4>
-                              <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-600">Region: {finding.region}</p>
+                              <h4 className="font-semibold text-gray-100 text-xs sm:text-sm">{finding.description}</h4>
+                              <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-300">Region: {finding.region}</p>
                             </div>
                             {(() => {
                               const pct = toPercent(finding.confidence);
@@ -228,25 +228,25 @@ const Results: React.FC = () => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-600 text-sm">No specific findings recorded</p>
+                    <p className="text-gray-300 text-sm">No specific findings recorded</p>
                   )}
                 </div>
               </div>
 
               {/* Recommendations - Responsive */}
               {analysis.recommendations && analysis.recommendations.length > 0 && (
-                <div className="overflow-hidden rounded-lg bg-white shadow-md">
-                  <div className="border-b border-gray-200 bg-gray-50 px-4 sm:px-6 py-3 sm:py-4">
-                    <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-800">Recommendations</h3>
+                <div className="overflow-hidden rounded-lg bg-gray-800/80 shadow-lg ring-1 ring-white/6">
+                  <div className="border-b border-gray-700 bg-gray-900/60 px-4 sm:px-6 py-3 sm:py-4">
+                    <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-100">Recommendations</h3>
                   </div>
                   <div className="p-4 sm:p-6">
                     <ul className="space-y-3">
                       {analysis.recommendations.map((rec, idx) => (
                         <li key={idx} className="flex items-start gap-3">
-                          <svg className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-success mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-green-300 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
-                          <span className="text-gray-700 text-xs sm:text-sm">{rec}</span>
+                          <span className="text-gray-300 text-xs sm:text-sm">{rec}</span>
                         </li>
                       ))}
                     </ul>
@@ -258,44 +258,44 @@ const Results: React.FC = () => {
             {/* Right Column - Responsive */}
             <div className="mt-6 lg:mt-0">
               {/* Quick Summary */}
-              <div className="overflow-hidden rounded-lg bg-white shadow-md">
-                <div className="border-b border-gray-200 bg-primary-50 px-4 sm:px-6 py-3 sm:py-4">
-                  <h3 className="font-bold text-primary text-sm sm:text-base lg:text-lg">Quick Summary</h3>
+              <div className="overflow-hidden rounded-lg bg-gray-800/80 shadow-lg ring-1 ring-white/6">
+                <div className="border-b border-gray-700 bg-gray-900/60 px-4 sm:px-6 py-3 sm:py-4">
+                  <h3 className="font-bold text-gray-100 text-sm sm:text-base lg:text-lg">Quick Summary</h3>
                 </div>
                 <div className="p-4 sm:p-6 space-y-4">
                   <div>
-                    <p className="text-xs sm:text-sm font-semibold text-gray-600">Status</p>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-300">Status</p>
                     <span className={`mt-1 sm:mt-2 inline-block rounded-full px-2 sm:px-3 py-1 text-xs font-semibold ${
                       analysis.status === 'completed'
-                        ? 'bg-success-50 text-success'
+                        ? 'bg-green-900/30 text-green-300'
                         : analysis.status === 'processing'
-                        ? 'bg-warning-50 text-warning'
-                        : 'bg-danger-50 text-danger'
+                        ? 'bg-yellow-900/30 text-yellow-300'
+                        : 'bg-red-900/30 text-red-300'
                     }`}>
                       {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
                     </span>
                   </div>
 
                   <div>
-                    <p className="text-xs sm:text-sm font-semibold text-gray-600">Overall Confidence</p>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-300">Overall Confidence</p>
                     <div className="mt-1 sm:mt-2 flex items-center gap-2">
-                      <div className="flex-1 h-2 rounded-full bg-gray-200">
+                      <div className="flex-1 h-2 rounded-full bg-gray-700">
                         <div
-                          className="h-full rounded-full bg-primary"
+                          className="h-full rounded-full bg-primary-600"
                           style={{ width: `${(toPercent(analysis.confidenceScore) || 0)}%` }}
                         ></div>
                       </div>
-                      <span className="font-bold text-gray-800 text-xs sm:text-sm">
-                        {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
-                          ? formatPercent(analysis.confidenceScore)
-                          : 'N/A'}
-                      </span>
+                        <span className="font-bold text-gray-900 dark:text-gray-100 text-xs sm:text-sm">
+                          {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
+                            ? formatPercent(analysis.confidenceScore)
+                            : 'N/A'}
+                        </span>
                     </div>
                   </div>
 
                   <div>
-                    <p className="text-xs sm:text-sm font-semibold text-gray-600">Findings Count</p>
-                    <p className="mt-1 sm:mt-2 text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-300">Findings Count</p>
+                    <p className="mt-1 sm:mt-2 text-lg sm:text-xl lg:text-2xl font-bold text-gray-100">
                       {analysis.findings ? analysis.findings.length : 0}
                     </p>
                   </div>
@@ -312,9 +312,9 @@ const Results: React.FC = () => {
           </div>
 
           {/* Disclaimer - Responsive */}
-          <div className="mt-8 sm:mt-12 flex items-start gap-3 rounded-lg bg-warning-50 p-4 text-[#333333]" role="alert">
+          <div className="mt-8 sm:mt-12 flex items-start gap-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 p-4 border border-yellow-200 dark:border-transparent" role="alert">
             <svg
-              className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 text-warning mt-0.5"
+              className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 text-yellow-300 mt-0.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -326,8 +326,8 @@ const Results: React.FC = () => {
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
               />
             </svg>
-            <p className="text-xs sm:text-sm text-[#333333]">
-              <strong>Important Notice:</strong> This analysis is for research and educational purposes only.
+            <p className="text-xs sm:text-sm text-gray-900 dark:text-gray-300">
+              <strong className="text-gray-900 dark:text-gray-100">Important Notice:</strong> This analysis is for research and educational purposes only.
               These results are not a clinical diagnosis and should not be used as a substitute for professional medical advice.
               Always consult with qualified healthcare professionals.
             </p>

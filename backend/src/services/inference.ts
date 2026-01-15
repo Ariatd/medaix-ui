@@ -472,12 +472,15 @@ async function generateGradCAMHeatmap(imageId: string): Promise<string> {
 
 /**
  * Save analysis result to database
+ * Creates a ResearchAnalysis record when analysis completes
  */
 async function saveAnalysisResult(
   imageId: string,
   result: AnalysisResult
 ): Promise<void> {
   try {
+    console.log(`[Inference] Attempting to save analysis result for image ${imageId}`);
+
     // Find the user who uploaded the image
     const image = await prisma.uploadedImage.findUnique({
       where: { id: imageId },
@@ -485,12 +488,14 @@ async function saveAnalysisResult(
     });
 
     if (!image) {
-      console.error(`[Inference] Image ${imageId} not found in database`);
+      console.error(`[Inference] Image ${imageId} not found in database - cannot save analysis result`);
       return;
     }
 
+    console.log(`[Inference] Found image uploaded by user ${image.uploadedById}`);
+
     // Create or update analysis record
-    await prisma.researchAnalysis.upsert({
+    const analysisRecord = await prisma.researchAnalysis.upsert({
       where: { id: result.id },
       create: {
         id: result.id,
@@ -537,9 +542,15 @@ async function saveAnalysisResult(
       }
     });
 
-    console.log(`[Inference] Analysis result saved for image ${imageId}`);
+    console.log(`[Inference] ✅ Analysis result saved successfully!`);
+    console.log(`[Inference]   - Analysis ID: ${analysisRecord.id}`);
+    console.log(`[Inference]   - Status: ${analysisRecord.status}`);
+    console.log(`[Inference]   - Confidence: ${analysisRecord.confidenceScore}`);
+    console.log(`[Inference]   - Image ID: ${analysisRecord.imageId}`);
+    console.log(`[Inference]   - Analyst ID: ${analysisRecord.analystId}`);
   } catch (error) {
-    console.error(`[Inference] Failed to save analysis result:`, error);
+    console.error(`[Inference] ❌ Failed to save analysis result for image ${imageId}:`, error);
+    console.error(`[Inference] Error details:`, JSON.stringify(error, null, 2));
   }
 }
 
