@@ -3,8 +3,10 @@
  * Handles communication with the backend API
  */
 
-// API Base URL - Backend portun olan 3001'e yönlendirildi
-const API_BASE_URL = 'http://localhost:3001/api';
+// API Base URL - Environment-aware configuration for production and development
+// In production (Vercel), use Render backend URL
+// In development, use localhost:3001
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 /**
  * Generic API client class
