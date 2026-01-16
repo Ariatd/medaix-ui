@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
-import { analysisService, type AnalysisResult } from '../api/analysisService';
+import { getAnalyses, getStatistics, deleteAnalysis } from '../utils/userDataManager';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
-import { formatPercent, toPercent } from '../utils/confidenceUtils';
+import { formatPercent } from '../utils/confidenceUtils';
 import { useIsMobile, useIsTablet } from '../hooks/useDeviceType';
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard: React.FC = () => {
   const { currentUser } = useAuth();
-  const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [analyses, setAnalyses] = useState<any[]>([]);
   const [stats, setStats] = useState({
     totalAnalyses: 0,
     thisMonth: 0,
@@ -26,37 +25,17 @@ const Dashboard: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!currentUser?.id) {
-        setLoading(false);
-        return;
-      }
+    if (!currentUser?.id) return;
 
-      try {
-        setLoading(true);
-        const response = await analysisService.getAnalyses();
-        const analysesData = response.data.analyses;
-        setAnalyses(analysesData);
-
-        // Get stats from API response
-        if (response.data.summary) {
-          setStats({
-            totalAnalyses: response.data.summary.totalAnalyses || 0,
-            thisMonth: 0, // Not available in current API response
-            successRate: response.data.summary.successRate || 0,
-            avgConfidence: response.data.summary.avgConfidence || 0,
-          });
-        }
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
-        addToast('Failed to load analyses', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [currentUser?.id, addToast]);
+    try {
+      const allAnalyses = getAnalyses(currentUser.id);
+      setAnalyses(allAnalyses);
+      const statistics = getStatistics(currentUser.id);
+      setStats(statistics);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    }
+  }, [currentUser?.id]);
 
   const recentAnalyses = analyses.slice(0, 5);
 
@@ -151,18 +130,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Recent Analyses Section */}
-          {loading ? (
-            <div className="mb-8 sm:mb-12 rounded-xl bg-white dark:bg-gray-800/80 p-4 sm:p-6 lg:p-8 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
-              <div className="animate-pulse space-y-4">
-                <div className="h-8 bg-gray-700 rounded w-1/4"></div>
-                <div className="space-y-3">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-16 bg-gray-700 rounded"></div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : recentAnalyses.length > 0 ? (
+          {recentAnalyses.length > 0 ? (
             <div className="mb-8 sm:mb-12 rounded-xl bg-white dark:bg-gray-800/80 p-4 sm:p-6 lg:p-8 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Recent Analyses</h2>
@@ -181,8 +149,8 @@ const Dashboard: React.FC = () => {
                     <div key={analysis.id} className="border border-gray-700 rounded-lg bg-gray-800/60 p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-100 text-sm truncate">{analysis.image?.fileName || 'Unknown'}</h3>
-                          <p className="text-xs text-gray-300">{new Date(analysis.createdAt).toLocaleDateString()}</p>
+                          <h3 className="font-medium text-gray-100 text-sm truncate">{analysis.fileName}</h3>
+                          <p className="text-xs text-gray-300">{new Date(analysis.uploadedAt).toLocaleDateString()}</p>
                         </div>
                         <span className={`inline-block rounded-full px-2 py-1 text-xs font-semibold ${
                           analysis.status === 'completed'
@@ -196,11 +164,11 @@ const Dashboard: React.FC = () => {
                       </div>
                       <div className="flex items-center justify-between mb-3">
                         <span className="inline-block rounded-full bg-blue-900/30 px-2 py-1 text-xs font-semibold text-blue-300">
-                          {analysis.image?.imageType || 'Unknown'}
+                          {analysis.imageType || 'Unknown'}
                         </span>
                         <span className="text-xs font-medium text-gray-100">
-                          {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
-                            ? formatPercent(analysis.confidenceScore)
+                          {analysis.results?.overallConfidence !== undefined && analysis.results?.overallConfidence !== null
+                            ? formatPercent(analysis.results.overallConfidence)
                             : 'N/A'}
                         </span>
                       </div>
@@ -233,43 +201,43 @@ const Dashboard: React.FC = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Date</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Image Name</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Type</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Status</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Confidence</th>
-                        <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-200">Action</th>
+                      <tr className="border-b border-gray-700">
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Date</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Image Name</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Type</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Status</th>
+                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Confidence</th>
+                        <th className="px-4 py-3 text-center text-sm font-semibold text-gray-200">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {recentAnalyses.map(analysis => (
-                        <tr key={analysis.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition">
-                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
-                            {new Date(analysis.createdAt).toLocaleDateString()}
+                        <tr key={analysis.id} className="border-b border-gray-700 hover:bg-gray-800/60 transition">
+                          <td className="px-4 py-4 text-sm text-gray-300">
+                            {new Date(analysis.uploadedAt).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {analysis.image?.fileName || 'Unknown'}
+                          <td className="px-4 py-4 text-sm font-medium text-gray-100">
+                            {analysis.fileName}
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
-                            <span className="inline-block rounded-full bg-blue-900/30 px-3 py-1 text-xs font-semibold text-blue-300 dark:text-blue-300">
-                              {analysis.image?.imageType || 'Unknown'}
+                          <td className="px-4 py-4 text-sm text-gray-300">
+                            <span className="inline-block rounded-full bg-blue-900/30 px-3 py-1 text-xs font-semibold text-blue-300">
+                              {analysis.imageType || 'Unknown'}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                          <td className="px-4 py-4 text-sm text-gray-300">
                             <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
                               analysis.status === 'completed'
-                                ? 'bg-success-50 text-success dark:bg-success-900/30 dark:text-success-300'
+                                ? 'bg-success-50 text-success'
                                 : analysis.status === 'processing'
-                                ? 'bg-warning-50 text-warning dark:bg-warning-900/30 dark:text-warning-300'
-                                : 'bg-danger-50 text-danger dark:bg-danger-900/30 dark:text-danger-300'
+                                ? 'bg-warning-50 text-warning'
+                                : 'bg-danger-50 text-danger'
                             }`}>
                               {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
-                              ? formatPercent(analysis.confidenceScore)
+                          <td className="px-4 py-4 text-sm font-medium text-gray-100">
+                            {analysis.results?.overallConfidence !== undefined && analysis.results?.overallConfidence !== null
+                              ? formatPercent(analysis.results.overallConfidence)
                               : 'N/A'}
                           </td>
                           <td className="px-4 py-4 text-center">
@@ -378,30 +346,21 @@ const Dashboard: React.FC = () => {
         cancelText="Cancel"
         loading={deleting}
         onCancel={() => { setShowDeleteModal(false); setDeleteId(null); }}
-        onConfirm={async () => {
-          if (!deleteId) return;
+        onConfirm={() => {
+          if (!currentUser?.id || !deleteId) return;
           setDeleting(true);
-          try {
-            await analysisService.deleteAnalysis(deleteId);
-            // Refresh data after deletion
-            const response = await analysisService.getAnalyses();
-            setAnalyses(response.data.analyses);
-            if (response.data.summary) {
-              setStats({
-                totalAnalyses: response.data.summary.totalAnalyses || 0,
-                thisMonth: 0,
-                successRate: response.data.summary.successRate || 0,
-                avgConfidence: response.data.summary.avgConfidence || 0,
-              });
-            }
+          const ok = deleteAnalysis(currentUser.id, deleteId);
+          setDeleting(false);
+          setShowDeleteModal(false);
+          setDeleteId(null);
+          if (ok) {
+            const updated = getAnalyses(currentUser.id);
+            setAnalyses(updated);
+            const statistics = getStatistics(currentUser.id);
+            setStats(statistics);
             addToast('Analysis deleted successfully', 'success');
-          } catch (error) {
-            console.error('Error deleting analysis:', error);
+          } else {
             addToast('Failed to delete analysis', 'error');
-          } finally {
-            setDeleting(false);
-            setShowDeleteModal(false);
-            setDeleteId(null);
           }
         }}
       />
