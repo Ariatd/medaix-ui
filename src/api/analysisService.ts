@@ -149,6 +149,21 @@ export interface AnalysisResultResponse {
   };
 }
 
+export interface StatisticsResponse {
+  success: boolean;
+  data: {
+    statistics: {
+      totalAnalyses: number;
+      successRate: number;
+      thisMonth: number;
+      avgConfidence: number;
+      completedAnalyses: number;
+      failedAnalyses: number;
+      pendingAnalyses: number;
+    };
+  };
+}
+
 export const analysisService = {
   /**
    * Get all analyses for the current user
@@ -190,6 +205,13 @@ export const analysisService = {
    */
   async updateAnalysisStatus(id: string, status: string): Promise<AnalysisResult> {
     return apiClient.patch(`/analyses/${id}`, { status });
+  },
+
+  /**
+   * Get user statistics
+   */
+  async getStatistics(userId: string): Promise<StatisticsResponse> {
+    return apiClient.get(`/analyses/user/${userId}/statistics`);
   },
 };
 

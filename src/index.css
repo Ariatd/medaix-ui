@@ -67,3 +67,138 @@ a:hover {
   .animate-fade-in-down {
     animation: fade-in-down 0.3s ease-out;
   }
+
+/* Responsive Design Utilities */
+
+/* Touch target minimum size for mobile (44px as per WCAG) */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure buttons have minimum touch target on mobile */
+@media (max-width: 640px) {
+  button,
+  [role="button"],
+  a.btn,
+  button.btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Form inputs touch targets */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 44px;
+  }
+}
+
+/* Safe area insets for notched devices */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Prevent horizontal scrolling on body */
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Better scrolling on mobile */
+@media (max-width: 768px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+  @apply overflow-x-auto;
+  @apply -mx-4 px-4;
+}
+
+@media (min-width: 768px) {
+  .table-responsive {
+    @apply mx-0 px-0;
+  }
+}
+
+/* Mobile-first card adjustments */
+@media (max-width: 640px) {
+  .card-mobile {
+    @apply rounded-none border-x-0;
+    @apply mx-[-1rem] w-[calc(100%+2rem)];
+  }
+}
+
+/* Prevent text overflow issues */
+.truncate-text {
+  @apply overflow-hidden;
+  @apply text-ellipsis;
+  @apply whitespace-nowrap;
+}
+
+/* Better focus states for accessibility */
+:focus-visible {
+  @apply outline-none;
+  @apply ring-2;
+  @apply ring-primary-500;
+  @apply ring-offset-2;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dark mode improvements */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600;
+    @apply rounded;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+}

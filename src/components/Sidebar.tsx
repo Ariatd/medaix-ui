@@ -13,6 +13,13 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   const isSmall = useIsTabletOrSmaller();
   const [isOpen, setIsOpen] = useState(!isSmall);
 
+  // Close sidebar when route changes on mobile
+  React.useEffect(() => {
+    if (isSmall) {
+      setIsOpen(false);
+    }
+  }, [location.pathname, isSmall]);
+
   if (!isAuthenticated) return null;
 
   const isActive = (path: string) => {
@@ -70,27 +77,32 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
 
   return (
     <>
-      {/* Sidebar Toggle Button (Mobile) */}
+      {/* Sidebar Toggle Button (Mobile) - Fixed position */}
       {isSmall && (
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="fixed top-20 left-4 z-50 p-2 rounded-lg bg-primary-600 text-white lg:hidden"
+          className="fixed top-4 left-4 z-[60] p-2.5 rounded-lg bg-primary-600 text-white shadow-lg lg:hidden touch-manipulation"
+          aria-label={isOpen ? 'Close menu' : 'Open menu'}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
           </svg>
         </button>
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-900 z-40 transition-transform border-r border-gray-200 dark:border-transparent ${
-          isSmall ? (isOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0 relative'
+        className={`fixed lg:relative left-0 top-0 h-screen w-64 bg-white dark:bg-gray-900 z-30 transition-transform duration-300 ease-in-out border-r border-gray-200 dark:border-gray-700 ${
+          isSmall 
+            ? isOpen 
+              ? 'translate-x-0' 
+              : '-translate-x-full lg:translate-x-0'
+            : 'translate-x-0'
         } pt-16 overflow-y-auto ${className}`}
       >
         {/* User Profile Section */}
         <div className="p-4">
-          <Link to="/profile" className="flex items-center gap-3 rounded-md p-1 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <Link to="/profile" className="flex items-center gap-3 rounded-md p-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
             <img
               src={currentUser?.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name || 'User'}&background=0066CC&color=fff`}
               alt="Avatar"
@@ -108,13 +120,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-2">
+        <nav className="p-4 space-y-1">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              onClick={() => isSmall && setIsOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition touch-manipulation ${
                 isActive(item.path)
                   ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-medium'
                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -130,7 +141,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
         <div className="my-4 border-t border-gray-200 dark:border-gray-700" />
 
         {/* Bottom Actions */}
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-1">
           {(() => {
             const targets = ['/profile', '/dashboard', '/upload', '/history', '/settings'];
             const inTarget = targets.includes(location.pathname) || location.pathname.startsWith('/results');
@@ -140,9 +151,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
                 <button
                   onClick={() => {
                     logout();
-                    isSmall && setIsOpen(false);
+                    setIsOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition text-sm"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition touch-manipulation text-sm"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -157,7 +168,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
                 <Link
                   to="/profile"
                   onClick={() => isSmall && setIsOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition touch-manipulation text-sm"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -167,9 +178,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
                 <button
                   onClick={() => {
                     logout();
-                    isSmall && setIsOpen(false);
+                    setIsOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition text-sm"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition touch-manipulation text-sm"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -185,7 +196,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
       {/* Overlay (Mobile) */}
       {isSmall && isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30"
+          className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}

@@ -10,7 +10,6 @@ interface DocSection {
 const Documentation: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeSection, setActiveSection] = useState('getting-started');
-  const [helpfulFeedback, setHelpfulFeedback] = useState<{ [key: string]: boolean }>({});
 
   const sections: DocSection[] = [
     {
@@ -281,43 +280,6 @@ Content-Type: multipart/form-data
             ) : (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
                 {sections.find((s) => s.id === activeSection)?.content}
-
-                {/* Helpful Feedback */}
-                <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">Was this helpful?</p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() =>
-                        setHelpfulFeedback((prev) => ({
-                          ...prev,
-                          [activeSection]: true,
-                        }))
-                      }
-                      className={`px-4 py-2 rounded-lg transition ${
-                        helpfulFeedback[activeSection] === true
-                          ? 'bg-success-600 text-white'
-                          : 'border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      👍 Yes
-                    </button>
-                    <button
-                      onClick={() =>
-                        setHelpfulFeedback((prev) => ({
-                          ...prev,
-                          [activeSection]: false,
-                        }))
-                      }
-                      className={`px-4 py-2 rounded-lg transition ${
-                        helpfulFeedback[activeSection] === false
-                          ? 'bg-danger-600 text-white'
-                          : 'border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      👎 No
-                    </button>
-                  </div>
-                </div>
               </div>
             )}
           </main>

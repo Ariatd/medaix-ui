@@ -42,5 +42,3 @@ export const defaultShortcuts: Shortcut[] = [
   { id: 'close-modal', keys: 'esc', label: 'Close Modal', section: 'General' },
   { id: 'focus-search', keys: '/', label: 'Focus Search', section: 'Navigation' },
 ];
-
-export default {};

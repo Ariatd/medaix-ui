@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import NotificationCenter from './NotificationCenter';
@@ -12,6 +12,8 @@ const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const location = useLocation();
+  const isDocumentation = location.pathname === '/documentation';
 
   return (
     <header className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40">
@@ -19,10 +21,10 @@ const Header: React.FC = () => {
 
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 sm:gap-3 transition duration-300 ease-in-out hover:scale-[1.05] group -ml-1 sm:-ml-2">
+        <button onClick={() => window.location.reload()} className="flex items-center gap-2 sm:gap-3 transition duration-300 ease-in-out hover:scale-[1.05] group -ml-1 sm:-ml-2">
           <NavbarLogo className="h-14 w-14 sm:h-16 sm:w-16" />
           <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white group-hover:text-primary dark:group-hover:text-blue-400 transition">MedAIx</span>
-        </Link>
+        </button>
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-6">
@@ -36,9 +38,6 @@ const Header: React.FC = () => {
               </Link>
               <Link to="/upload" className="text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:text-primary-600 dark:hover:text-primary-400">
                 Upload
-              </Link>
-              <Link to="/documentation" className="text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:text-primary-600 dark:hover:text-primary-400">
-                Docs
               </Link>
               <Link to="/settings" className="text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:text-primary-600 dark:hover:text-primary-400">
                 Settings

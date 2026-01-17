@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
@@ -8,6 +8,7 @@ import { useInView, useCountUp, prefersReducedMotion } from '../hooks/useScrollA
 
 const Landing: React.FC = () => {
   const reduceMotion = prefersReducedMotion();
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // Section refs
   const [heroRef, heroInView] = useInView({ threshold: 0.3, triggerOnce: true });
@@ -49,38 +50,49 @@ const Landing: React.FC = () => {
     <Layout>
       <div className="w-full overflow-hidden">
         {/* Landing Page Header - Custom layout for unauthenticated users */}
-        <header className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-primary-600 to-blue-700 relative">
-          {/* Left - Text */}
-          <span className="text-xl font-bold text-white">MedAIx</span>
+        <header className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-primary-600 to-blue-700 relative">
+          {/* Left - Logo */}
+          <span className="text-lg sm:text-xl font-bold text-white">MedAIx</span>
 
-          {/* Center - Inline Links (Account, Upload, Dashboard, Documentation) */}
-          <nav className="flex-1 flex justify-center">
-            <ul className="flex gap-12">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="lg:hidden p-2 text-white hover:bg-white/20 rounded-lg transition"
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={showMobileMenu ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
+
+          {/* Desktop Navigation - Hidden on Mobile */}
+          <nav className="hidden lg:flex flex-1 justify-center">
+            <ul className="flex gap-6 xl:gap-12">
               <li>
-                <Link to="/profile" className="text-white text-sm">
+                <Link to="/profile" className="text-white text-sm hover:text-gray-200 transition">
                   Account
                 </Link>
               </li>
               <li>
-                <Link to="/upload" className="text-white text-sm">
+                <Link to="/upload" className="text-white text-sm hover:text-gray-200 transition">
                   Upload
                 </Link>
               </li>
               <li>
-                <Link to="/dashboard" className="text-white text-sm">
+                <Link to="/dashboard" className="text-white text-sm hover:text-gray-200 transition">
                   Dashboard
                 </Link>
               </li>
               <li>
-                <Link to="/documentation" className="text-white text-sm">
+                <Link to="/documentation" className="text-white text-sm hover:text-gray-200 transition">
                   Documentation
                 </Link>
               </li>
             </ul>
           </nav>
 
-          {/* Right - Buttons */}
-          <div className="flex gap-3">
+          {/* Desktop Buttons - Hidden on Mobile */}
+          <div className="hidden lg:flex gap-3">
             <Link 
               to="/login" 
               className="px-4 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition text-sm font-medium"
@@ -95,6 +107,58 @@ const Landing: React.FC = () => {
             </Link>
           </div>
         </header>
+
+        {/* Mobile Menu Dropdown */}
+        {showMobileMenu && (
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-gradient-to-r from-primary-700 to-blue-800 px-4 py-4 shadow-lg z-50">
+            <nav className="flex flex-col space-y-3">
+              <Link 
+                to="/profile" 
+                onClick={() => setShowMobileMenu(false)}
+                className="text-white text-sm py-2 px-3 rounded hover:bg-white/10 transition"
+              >
+                Account
+              </Link>
+              <Link 
+                to="/upload" 
+                onClick={() => setShowMobileMenu(false)}
+                className="text-white text-sm py-2 px-3 rounded hover:bg-white/10 transition"
+              >
+                Upload
+              </Link>
+              <Link 
+                to="/dashboard" 
+                onClick={() => setShowMobileMenu(false)}
+                className="text-white text-sm py-2 px-3 rounded hover:bg-white/10 transition"
+              >
+                Dashboard
+              </Link>
+              <Link 
+                to="/documentation" 
+                onClick={() => setShowMobileMenu(false)}
+                className="text-white text-sm py-2 px-3 rounded hover:bg-white/10 transition"
+              >
+                Documentation
+              </Link>
+              <div className="pt-3 border-t border-white/20 flex flex-col gap-2">
+                <Link 
+                  to="/login" 
+                  onClick={() => setShowMobileMenu(false)}
+                  className="px-4 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition text-center text-sm font-medium"
+                >
+                  Login
+                </Link>
+                <Link 
+                  to="/signup" 
+                  onClick={() => setShowMobileMenu(false)}
+                  className="px-4 py-2 bg-white text-primary-600 rounded-lg hover:bg-gray-100 transition text-center text-sm font-semibold"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            </nav>
+          </div>
+        )}
 
         
 

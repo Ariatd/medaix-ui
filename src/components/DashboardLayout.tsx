@@ -1,8 +1,7 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
-import { Link } from 'react-router-dom';
 import Logo from './Logo';
 import GlobalSearch from './GlobalSearch';
 import { useTheme } from '../context/ThemeContext';
@@ -44,26 +43,26 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, showHelp = 
     <div className="min-h-screen bg-background-50 dark:bg-gray-900 text-gray-900 dark:text-white">
       {/* Fixed brand block in top-left (over the header area) */}
       <div className="fixed left-0 top-0 h-16 w-64 bg-primary-600 flex items-center gap-3 px-4 z-50 shadow-md">
-        <Link to="/dashboard" className="flex items-center gap-3 text-white">
+        <button onClick={() => window.location.reload()} className="flex items-center gap-3 text-white">
           <Logo size={32} />
           <span className="font-bold text-lg">MedAIx</span>
-        </Link>
+        </button>
       </div>
       <div className="flex">
         {/* Fixed sidebar on the left */}
         <Sidebar />
 
         {/* Main column: header, content and footer */}
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col min-h-screen w-full">
           {/* Dashboard top header (sticky within the main column) */}
           <header className="sticky top-0 z-20 h-16 w-full bg-white dark:bg-gray-800 transition-colors border-b border-gray-200 dark:border-gray-700">
-            <div className="mx-auto max-w-7xl h-full px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-full h-full px-4 sm:px-6 lg:px-8">
               <div className="flex h-full items-center justify-between">
                 <div className="flex items-center gap-4">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{pageTitle}</h2>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   {/* Search (visual only) */}
                   <GlobalSearch />
 
@@ -71,7 +70,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, showHelp = 
                   <button
                     aria-label="Toggle theme"
                     onClick={toggleTheme}
-                    className="rounded-md p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition"
+                    className="rounded-md p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition touch-manipulation"
                   >
                     {theme === 'dark' ? (
                       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -87,7 +86,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, showHelp = 
                   {/* Notifications */}
                   <button
                     aria-label="Notifications"
-                    className="rounded-md p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition"
+                    className="rounded-md p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition touch-manipulation"
                   >
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />

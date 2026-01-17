@@ -99,11 +99,23 @@ const History: React.FC = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
-    // Delete functionality not yet implemented in backend
-    setShowDeleteModal(false);
-    setDeleteId(null);
-    addToast('Delete functionality not yet implemented', 'info');
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    
+    try {
+      await analysisService.deleteAnalysis(deleteId);
+      setShowDeleteModal(false);
+      setDeleteId(null);
+      addToast('Analysis deleted successfully', 'success');
+      
+      // Refresh the list
+      const response = await analysisService.getAnalyses();
+      setAllAnalyses(response.data.analyses);
+      setFilteredAnalyses(response.data.analyses);
+    } catch (error) {
+      console.error('Error deleting analysis:', error);
+      addToast('Failed to delete analysis', 'error');
+    }
   };
 
   const handleExport = () => {
@@ -174,23 +186,8 @@ const History: React.FC = () => {
           ) : (
             <>
               {/* Header - Responsive */}
-              <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl sm:text-4xl font-bold text-[#333333]">Analysis History</h1>
-                  <p className="mt-2 text-sm sm:text-base text-gray-600">
-                    {allAnalyses.length} analysis{allAnalyses.length !== 1 ? 'es' : ''}
-                  </p>
-                </div>
-                <button
-                  onClick={handleExport}
-                  disabled={filteredAnalyses.length === 0}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
-                >
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Export CSV
-                </button>
+              <div className="mb-6 sm:mb-8">
+                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white">Analysis History</h1>
               </div>
 
               {/* Success Message */}
@@ -205,50 +202,50 @@ const History: React.FC = () => {
 
               {/* Filters Section - Responsive */}
               <div className="mb-6 sm:mb-8 rounded-xl bg-white dark:bg-gray-800/80 p-4 sm:p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
-                <h2 className="mb-4 text-base sm:text-lg font-bold text-gray-100">Filters</h2>
+                <h2 className="mb-4 text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">Filters</h2>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                   {/* Search */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-300">Search</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-300">Search</label>
                     <input
                       type="text"
                       placeholder="File name or ID..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full rounded-lg border border-gray-600 bg-gray-900/40 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-100"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     />
                   </div>
 
                   {/* Start Date */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-300">Start Date</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-300">Start Date</label>
                     <input
                       type="date"
                       value={filters.startDate}
                       onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                      className="w-full rounded-lg border border-gray-600 bg-gray-900/40 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-100"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     />
                   </div>
 
                   {/* End Date */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-300">End Date</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-300">End Date</label>
                     <input
                       type="date"
                       value={filters.endDate}
                       onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     />
                   </div>
 
                   {/* Status */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-300">Status</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-300">Status</label>
                     <select
                       value={filters.status}
                       onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     >
                       <option value="">All Statuses</option>
                       {statuses.map((status) => (
@@ -261,11 +258,11 @@ const History: React.FC = () => {
 
                   {/* Sort */}
                   <div>
-                    <label className="mb-2 block text-sm font-semibold text-gray-300">Sort By</label>
+                    <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-300">Sort By</label>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 text-sm sm:text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     >
                       <option value="date">Date (Newest)</option>
                       <option value="confidence">Confidence (High to Low)</option>
@@ -289,7 +286,7 @@ const History: React.FC = () => {
               </div>
 
               {/* Results Count */}
-              <div className="mb-4 text-xs sm:text-sm text-gray-300">
+              <div className="mb-4 text-xs sm:text-sm text-gray-900 dark:text-gray-300">
                 Showing <span className="font-semibold">{paginatedAnalyses.length}</span> of{' '}
                 <span className="font-semibold">{filteredAnalyses.length}</span> analyses
               </div>
@@ -311,37 +308,30 @@ const History: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center justify-between mb-3">
-                            <span className="inline-block rounded-full bg-blue-900/30 px-2 sm:px-3 py-1 text-xs font-semibold text-blue-300">
+                            <span className="inline-block rounded-full bg-blue-900/30 px-2 sm:px-3 py-1 text-xs font-semibold text-gray-900 dark:text-gray-100">
                               {analysis.image?.imageType || 'Unknown'}
                             </span>
-                          {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null ? (
-                            (() => {
-                              const pct = toPercent(analysis.confidenceScore) || 0;
-                              return (
-                                <span className={`inline-block rounded-full px-2 sm:px-3 py-1 text-xs font-semibold ${getConfidenceColor(pct)}`}>
-                                  {formatPercent(analysis.confidenceScore)}
-                                </span>
-                              );
-                            })()
-                          ) : (
-                            <span className="text-gray-500 text-xs">-</span>
-                          )}
-                        </div>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                              {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
+                                ? formatPercent(analysis.confidenceScore)
+                                : '-'}
+                            </span>
+                          </div>
                         <div className="flex items-center justify-center gap-2">
                           <Link
                             to={`/results/${analysis.id}`}
                             title="View details"
-                            className="rounded-lg bg-primary-900/30 p-2 text-primary transition hover:bg-primary hover:text-white"
+                            className="rounded-lg bg-primary-900/30 p-2.5 text-primary transition hover:bg-primary hover:text-white touch-manipulation"
                           >
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-7-9.542 7-4.477 5.064 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </Link>
                           <button
                             onClick={() => handleDelete(analysis.id)}
                             title="Delete"
-                            className="rounded-lg bg-red-900/30 p-2 text-red-400 transition hover:bg-red-600 hover:text-white"
+                            className="rounded-lg bg-red-900/30 p-2.5 text-red-400 transition hover:bg-red-600 hover:text-white touch-manipulation"
                           >
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -352,88 +342,81 @@ const History: React.FC = () => {
                     ))}
                   </div>
 
-                  {/* Desktop Table View */}
+                  {/* Desktop Table View - With overflow handling */}
                   <div className="hidden lg:block overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-gray-800/60 border-b border-gray-700">
-                        <tr>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Date</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">File Name</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Image Type</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Status</th>
-                          <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Confidence</th>
-                          <th className="px-6 py-4 text-center text-sm font-semibold text-gray-200">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paginatedAnalyses.map((analysis) => (
-                          <tr key={analysis.id} className="border-b border-gray-700 hover:bg-gray-800/60 transition">
-                            <td className="px-6 py-4 text-sm text-gray-300">
-                              {new Date(analysis.createdAt).toLocaleString()}
-                            </td>
-                            <td className="px-6 py-4 text-sm font-medium text-gray-100">
-                              {analysis.image?.fileName || 'Unknown'}
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                              <span className="inline-block rounded-full bg-blue-900/30 px-3 py-1 text-xs font-semibold text-blue-300">
-                                {analysis.image?.imageType || 'Unknown'}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                              <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(analysis.status)}`}>
-                                {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                              {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null ? (
-                                (() => {
-                                  const pct = toPercent(analysis.confidenceScore) || 0;
-                                  return (
-                                    <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${getConfidenceColor(pct)}`}>
-                                      {formatPercent(analysis.confidenceScore)}
-                                    </span>
-                                  );
-                                })()
-                              ) : (
-                                <span className="text-gray-400">-</span>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-center">
-                              <div className="flex items-center justify-center gap-2">
-                                <Link
-                                  to={`/results/${analysis.id}`}
-                                  title="View details"
-                                  className="rounded-lg bg-primary-900/30 p-2 text-primary transition hover:bg-primary hover:text-white"
-                                >
-                                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                  </svg>
-                                </Link>
-                                <button
-                                  onClick={() => handleDelete(analysis.id)}
-                                  title="Delete"
-                                  className="rounded-lg bg-red-900/30 p-2 text-red-400 transition hover:bg-red-600 hover:text-white"
-                                >
-                                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                  </svg>
-                                </button>
-                              </div>
-                            </td>
+                    <div className="min-w-full inline-block align-middle">
+                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-800/60">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Date</th>
+                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">File Name</th>
+                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Image Type</th>
+                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Status</th>
+                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Confidence</th>
+                            <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Actions</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                          {paginatedAnalyses.map((analysis) => (
+                            <tr key={analysis.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition">
+                              <td className="px-6 py-4 text-sm text-gray-800 dark:text-gray-300 whitespace-nowrap">
+                                {new Date(analysis.createdAt).toLocaleString()}
+                              </td>
+                              <td className="px-6 py-4 text-sm font-medium text-gray-800 dark:text-gray-100 max-w-xs truncate">
+                                {analysis.image?.fileName || 'Unknown'}
+                              </td>
+                              <td className="px-6 py-4 text-sm whitespace-nowrap">
+                                <span className="inline-block rounded-full bg-blue-900/30 px-3 py-1 text-xs font-semibold text-gray-900 dark:text-gray-100">
+                                  {analysis.image?.imageType || 'Unknown'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-sm whitespace-nowrap">
+                                <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(analysis.status)}`}>
+                                  {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-sm font-semibold text-gray-800 dark:text-gray-100 whitespace-nowrap">
+                                {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
+                                  ? formatPercent(analysis.confidenceScore)
+                                  : '-'}
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <div className="flex items-center justify-center gap-2">
+                                  <Link
+                                    to={`/results/${analysis.id}`}
+                                    title="View details"
+                                    className="rounded-lg bg-primary-900/30 p-2 text-primary transition hover:bg-primary hover:text-white touch-manipulation"
+                                  >
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                  </Link>
+                                  <button
+                                    onClick={() => handleDelete(analysis.id)}
+                                    title="Delete"
+                                    className="rounded-lg bg-red-900/30 p-2 text-red-400 transition hover:bg-red-600 hover:text-white touch-manipulation"
+                                  >
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
 
                   {/* Pagination - Responsive */}
                   {totalPages > 1 && (
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-0 border-t border-gray-700 bg-gray-800/60 px-4 sm:px-6 py-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-0 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 px-4 sm:px-6 py-4">
                       <button
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="rounded-lg border border-gray-600 px-3 py-1 text-sm font-semibold transition hover:bg-gray-700/40 disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1"
+                        className="rounded-lg border border-gray-300 bg-white px-3 py-1 text-sm font-semibold text-gray-900 transition hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700/40"
                       >
                         ← Previous
                       </button>
@@ -446,7 +429,7 @@ const History: React.FC = () => {
                             className={`rounded-lg px-3 py-1 text-sm font-semibold transition ${
                               currentPage === page
                                 ? 'bg-primary text-white'
-                                : 'border border-gray-600 hover:bg-gray-700/40'
+                                : 'border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700/40'
                             }`}
                           >
                             {page}
@@ -457,7 +440,7 @@ const History: React.FC = () => {
                       <button
                         onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        className="rounded-lg border border-gray-600 px-3 py-1 text-sm font-semibold transition hover:bg-gray-700/40 disabled:opacity-50 disabled:cursor-not-allowed order-3 sm:order-3"
+                        className="rounded-lg border border-gray-300 bg-white px-3 py-1 text-sm font-semibold text-gray-900 transition hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed order-3 sm:order-3 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700/40"
                       >
                         Next →
                       </button>

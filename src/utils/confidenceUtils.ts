@@ -28,5 +28,3 @@ export function formatPercent(raw?: number | null, round = true): string {
   if (p === null) return 'N/A';
   return `${round ? Math.round(p) : +p.toFixed(2)}%`;
 }
-
-export default { toPercent, formatPercent };

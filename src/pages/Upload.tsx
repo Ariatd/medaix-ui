@@ -91,9 +91,9 @@ const Upload: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-sm sm:text-base font-semibold text-gray-100">Supported Formats</h3>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Supported Formats</h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-300">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                 DICOM, JPEG, PNG, TIFF files up to 50MB
               </p>
             </div>
@@ -106,9 +106,9 @@ const Upload: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </div>
-                <h3 className="text-sm sm:text-base font-semibold text-gray-100">Image Types</h3>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Image Types</h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-300">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                 X-rays, MRI, CT scans, ultrasound images
               </p>
             </div>
@@ -121,9 +121,9 @@ const Upload: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-sm sm:text-base font-semibold text-gray-100">Processing Time</h3>
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">Processing Time</h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-300">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                 Usually 30-60 seconds depending on file size
               </p>
             </div>

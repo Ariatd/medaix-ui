@@ -60,9 +60,10 @@ app.use(helmet({
 // --- GÜNCELLENMİŞ CORS AYARI ---
 // Vercel ve localhost bağlantılarına izin verir
 const allowedOrigins = [
-  'https://medaix-ui-a38l.vercel.app', // Vercel frontend
-  'http://localhost:5173', // Vite dev server
-  'http://localhost:3000', // Alternative local port
+  'https://medaix-ui-a38l.vercel.app',
+  'https://medaix-ui-a38l-p9v8a3fib-ariatd99-6569s-projects.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
 ];
 
 app.use(cors({

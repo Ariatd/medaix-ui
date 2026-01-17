@@ -1,22 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Eye } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
-import { getAnalyses, getStatistics, deleteAnalysis } from '../utils/userDataManager';
+import { analysisService, type AnalysisResult } from '../api/analysisService';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
-import { formatPercent } from '../utils/confidenceUtils';
+import { formatPercent, toPercent } from '../utils/confidenceUtils';
 import { useIsMobile, useIsTablet } from '../hooks/useDeviceType';
 import { useAuth } from '../context/AuthContext';
 
+interface DashboardStats {
+  totalAnalyses: number;
+  thisMonth: number;
+  successRate: number;
+  avgConfidence: number;
+}
+
 const Dashboard: React.FC = () => {
   const { currentUser } = useAuth();
-  const [analyses, setAnalyses] = useState<any[]>([]);
-  const [stats, setStats] = useState({
+  const [analyses, setAnalyses] = useState<AnalysisResult[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
     totalAnalyses: 0,
     thisMonth: 0,
     successRate: 0,
     avgConfidence: 0,
   });
+  const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const { addToast } = useToast();
@@ -24,24 +33,154 @@ const Dashboard: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Fetch analyses and statistics on mount
   useEffect(() => {
-    if (!currentUser?.id) return;
-
-    try {
-      const allAnalyses = getAnalyses(currentUser.id);
-      setAnalyses(allAnalyses);
-      const statistics = getStatistics(currentUser.id);
-      setStats(statistics);
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
+    if (!currentUser?.id) {
+      setLoading(false);
+      return;
     }
+
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch analyses from API (same endpoint as History page)
+        const analysesResponse = await analysisService.getAnalyses();
+        const fetchedAnalyses = analysesResponse.data.analyses || [];
+        
+        // Sort by date (newest first) and get last 5
+        const sortedAnalyses = [...fetchedAnalyses].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setAnalyses(sortedAnalyses);
+
+        // Fetch statistics from API
+        const statsResponse = await analysisService.getStatistics(currentUser.id);
+        const statistics = statsResponse.data.statistics;
+        
+        setStats({
+          totalAnalyses: statistics.totalAnalyses || 0,
+          thisMonth: statistics.thisMonth || 0,
+          successRate: statistics.successRate || 0,
+          avgConfidence: statistics.avgConfidence || 0,
+        });
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        addToast('Failed to load dashboard data', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, [currentUser?.id]);
 
   const recentAnalyses = analyses.slice(0, 5);
 
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    
+    try {
+      setDeleting(true);
+      await analysisService.deleteAnalysis(deleteId);
+      
+      // Update local state after deletion
+      const updatedAnalyses = analyses.filter(a => a.id !== deleteId);
+      setAnalyses(updatedAnalyses);
+      
+      // Recalculate stats
+      const completedCount = updatedAnalyses.filter(a => a.status === 'completed').length;
+      const totalCount = updatedAnalyses.length;
+      const successRate = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+      const avgConfidence = completedCount > 0
+        ? updatedAnalyses
+            .filter(a => a.status === 'completed' && a.confidenceScore !== null)
+            .reduce((sum, a) => sum + (toPercent(a.confidenceScore) || 0), 0) / completedCount
+        : 0;
+      
+      // Count this month
+      const now = new Date();
+      const thisMonth = updatedAnalyses.filter(a => {
+        const date = new Date(a.createdAt);
+        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+      }).length;
+      
+      setStats({
+        totalAnalyses: totalCount,
+        thisMonth,
+        successRate: Math.round(successRate * 100) / 100,
+        avgConfidence: Math.round(avgConfidence),
+      });
+      
+      addToast('Analysis deleted successfully', 'success');
+    } catch (error) {
+      console.error('Error deleting analysis:', error);
+      addToast('Failed to delete analysis', 'error');
+    } finally {
+      setDeleting(false);
+      setShowDeleteModal(false);
+      setDeleteId(null);
+    }
+  };
+
   // Determine grid columns based on device
   const paddingClass = isMobile ? 'px-4 py-6' : isTablet ? 'px-6 py-10' : 'px-6 py-12';
   const maxWidthClass = isMobile ? 'max-w-full' : 'max-w-7xl';
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-success-50 text-success';
+      case 'processing':
+        return 'bg-warning-50 text-warning';
+      case 'failed':
+        return 'bg-danger-50 text-danger';
+      default:
+        return 'bg-gray-50 text-gray-700';
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className={`min-h-screen bg-[#f7f8fa] dark:bg-[#071029] ${paddingClass}`}>
+          <div className={`mx-auto ${maxWidthClass}`}>
+            <div className="mb-8 sm:mb-12">
+              <div className="h-8 sm:h-10 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
+              <div className="h-4 sm:h-5 bg-gray-200 dark:bg-gray-700 rounded w-64 animate-pulse"></div>
+            </div>
+            
+            {/* Loading skeleton for stats */}
+            <div className={`mb-8 sm:mb-12 grid gap-4 sm:gap-6 ${isMobile ? 'grid-cols-1' : isTablet ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="rounded-xl bg-white dark:bg-gray-800/80 p-4 sm:p-6 shadow-sm animate-pulse">
+                  <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-4"></div>
+                  <div className="h-8 sm:h-10 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Loading skeleton for recent analyses */}
+            <div className="rounded-xl bg-white dark:bg-gray-800/80 p-4 sm:p-6 lg:p-8">
+              <div className="h-6 sm:h-7 bg-gray-200 dark:bg-gray-700 rounded w-40 mb-6 animate-pulse"></div>
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -65,7 +204,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-300">Total Analyses</p>
                   <p className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold text-primary">{stats.totalAnalyses}</p>
-                  <p className="mt-1 text-xs text-gray-400">All-time total</p>
+                  <p className="mt-1 text-xs text-gray-900 dark:text-gray-400">All-time total</p>
                 </div>
                 <div className="rounded-lg bg-primary-900/30 p-3 sm:p-4 flex-shrink-0">
                   <svg className="h-6 w-6 sm:h-8 sm:w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +223,7 @@ const Dashboard: React.FC = () => {
                   <div className="mt-3 h-2 rounded-full bg-gray-200">
                     <div
                       className="h-full rounded-full bg-success transition-all duration-300"
-                      style={{ width: `${stats.successRate}%` }}
+                      style={{ width: `${Math.min(stats.successRate, 100)}%` }}
                     ></div>
                   </div>
                 </div>
@@ -102,7 +241,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-300">This Month</p>
                   <p className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-600">{stats.thisMonth}</p>
-                  <p className="mt-1 text-xs text-gray-500">Analyses performed</p>
+                  <p className="mt-1 text-xs text-gray-900 dark:text-gray-500">Analyses performed</p>
                 </div>
                 <div className="rounded-lg bg-blue-900/30 p-3 sm:p-4 flex-shrink-0">
                   <svg className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,7 +257,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-300">Avg Confidence</p>
                   <p className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold text-orange-600">{stats.avgConfidence}%</p>
-                  <p className="mt-1 text-xs text-gray-500">Analysis accuracy</p>
+                  <p className="mt-1 text-xs text-gray-900 dark:text-gray-500">Analysis accuracy</p>
                 </div>
                 <div className="rounded-lg bg-amber-900/30 p-3 sm:p-4 flex-shrink-0">
                   <svg className="h-6 w-6 sm:h-8 sm:w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,46 +288,37 @@ const Dashboard: React.FC = () => {
                     <div key={analysis.id} className="border border-gray-700 rounded-lg bg-gray-800/60 p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-100 text-sm truncate">{analysis.fileName}</h3>
-                          <p className="text-xs text-gray-300">{new Date(analysis.uploadedAt).toLocaleDateString()}</p>
+                          <h3 className="font-medium text-gray-100 text-sm truncate">{analysis.image?.fileName || 'Unknown'}</h3>
+                          <p className="text-xs text-gray-300">{new Date(analysis.createdAt).toLocaleDateString()}</p>
                         </div>
-                        <span className={`inline-block rounded-full px-2 py-1 text-xs font-semibold ${
-                          analysis.status === 'completed'
-                            ? 'bg-success-50 text-success'
-                            : analysis.status === 'processing'
-                            ? 'bg-warning-50 text-warning'
-                            : 'bg-danger-50 text-danger'
-                        }`}>
+                        <span className={`inline-block rounded-full px-2 py-1 text-xs font-semibold ${getStatusColor(analysis.status)}`}>
                           {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="inline-block rounded-full bg-blue-900/30 px-2 py-1 text-xs font-semibold text-blue-300">
-                          {analysis.imageType || 'Unknown'}
+                        <span className="inline-block rounded-full bg-blue-900/30 px-2 py-1 text-xs font-semibold text-gray-900 dark:text-gray-100">
+                          {analysis.image?.imageType || 'Unknown'}
                         </span>
                         <span className="text-xs font-medium text-gray-100">
-                          {analysis.results?.overallConfidence !== undefined && analysis.results?.overallConfidence !== null
-                            ? formatPercent(analysis.results.overallConfidence)
+                          {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
+                            ? formatPercent(analysis.confidenceScore)
                             : 'N/A'}
                         </span>
                       </div>
                       <div className="flex items-center justify-center gap-2">
                         <Link
                           to={`/results/${analysis.id}`}
-                          className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-primary-900/30 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white"
+                          title="View details"
+                          className="rounded-lg bg-primary-900/30 p-2.5 text-primary transition hover:bg-primary hover:text-white touch-manipulation"
                         >
-                          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          View
+                          <Eye className="h-4 w-4" />
                         </Link>
                         <button
-                          onClick={() => { setDeleteId(analysis.id); setShowDeleteModal(true); }}
+                          onClick={() => handleDelete(analysis.id)}
                           title="Delete"
-                          className="rounded-lg bg-red-900/30 p-2 text-red-400 transition hover:bg-red-600 hover:text-white"
+                          className="rounded-lg bg-red-900/30 p-2.5 text-red-400 transition hover:bg-red-600 hover:text-white touch-manipulation"
                         >
-                          <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
@@ -197,77 +327,70 @@ const Dashboard: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                /* Desktop Table View */
+                /* Desktop Table View - With overflow handling */
                 <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-700">
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Date</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Image Name</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Type</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Status</th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-200">Confidence</th>
-                        <th className="px-4 py-3 text-center text-sm font-semibold text-gray-200">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentAnalyses.map(analysis => (
-                        <tr key={analysis.id} className="border-b border-gray-700 hover:bg-gray-800/60 transition">
-                          <td className="px-4 py-4 text-sm text-gray-300">
-                            {new Date(analysis.uploadedAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-4 text-sm font-medium text-gray-100">
-                            {analysis.fileName}
-                          </td>
-                          <td className="px-4 py-4 text-sm text-gray-300">
-                            <span className="inline-block rounded-full bg-blue-900/30 px-3 py-1 text-xs font-semibold text-blue-300">
-                              {analysis.imageType || 'Unknown'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4 text-sm text-gray-300">
-                            <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
-                              analysis.status === 'completed'
-                                ? 'bg-success-50 text-success'
-                                : analysis.status === 'processing'
-                                ? 'bg-warning-50 text-warning'
-                                : 'bg-danger-50 text-danger'
-                            }`}>
-                              {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4 text-sm font-medium text-gray-100">
-                            {analysis.results?.overallConfidence !== undefined && analysis.results?.overallConfidence !== null
-                              ? formatPercent(analysis.results.overallConfidence)
-                              : 'N/A'}
-                          </td>
-                          <td className="px-4 py-4 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <Link
-                                to={`/results/${analysis.id}`}
-                                className="inline-flex items-center gap-2 rounded-lg bg-primary-900/30 px-3 py-1 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
-                              >
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                View
-                              </Link>
-
-                              <button
-                                onClick={() => { setDeleteId(analysis.id); setShowDeleteModal(true); }}
-                                title="Delete"
-                                className="rounded-lg bg-red-900/30 p-2 text-red-400 transition hover:bg-red-600 hover:text-white"
-                              >
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
-                            </div>
-                          </td>
+                  <div className="min-w-full inline-block align-middle">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead>
+                        <tr className="border-b border-gray-700">
+                          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Date</th>
+                          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Image Name</th>
+                          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Type</th>
+                          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Status</th>
+                          <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Confidence</th>
+                          <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-gray-200 whitespace-nowrap">Action</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {recentAnalyses.map(analysis => (
+                          <tr key={analysis.id} className="border-b border-gray-700 hover:bg-gray-800/60 transition">
+                            <td className="px-4 py-4 text-sm text-gray-900 dark:text-gray-300 whitespace-nowrap">
+                              {new Date(analysis.createdAt).toLocaleDateString()}
+                            </td>
+                            <td className="px-4 py-4 text-sm font-medium text-gray-900 dark:text-gray-100 max-w-xs truncate">
+                              {analysis.image?.fileName || 'Unknown'}
+                            </td>
+                            <td className="px-4 py-4 text-sm whitespace-nowrap">
+                              <span className="inline-block rounded-full bg-blue-900/30 px-3 py-1 text-xs font-semibold text-gray-900 dark:text-gray-100">
+                                {analysis.image?.imageType || 'Unknown'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 text-sm whitespace-nowrap">
+                              <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(analysis.status)}`}>
+                                {analysis.status.charAt(0).toUpperCase() + analysis.status.slice(1)}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 text-sm font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                              {analysis.confidenceScore !== undefined && analysis.confidenceScore !== null
+                                ? formatPercent(analysis.confidenceScore)
+                                : 'N/A'}
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <Link
+                                  to={`/results/${analysis.id}`}
+                                  title="View details"
+                                  className="rounded-lg bg-primary-900/30 p-2 text-primary transition hover:bg-primary hover:text-white touch-manipulation"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Link>
+
+                                <button
+                                  onClick={() => handleDelete(analysis.id)}
+                                  title="Delete"
+                                  className="rounded-lg bg-red-900/30 p-2 text-red-400 transition hover:bg-red-600 hover:text-white touch-manipulation"
+                                >
+                                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
@@ -346,26 +469,11 @@ const Dashboard: React.FC = () => {
         cancelText="Cancel"
         loading={deleting}
         onCancel={() => { setShowDeleteModal(false); setDeleteId(null); }}
-        onConfirm={() => {
-          if (!currentUser?.id || !deleteId) return;
-          setDeleting(true);
-          const ok = deleteAnalysis(currentUser.id, deleteId);
-          setDeleting(false);
-          setShowDeleteModal(false);
-          setDeleteId(null);
-          if (ok) {
-            const updated = getAnalyses(currentUser.id);
-            setAnalyses(updated);
-            const statistics = getStatistics(currentUser.id);
-            setStats(statistics);
-            addToast('Analysis deleted successfully', 'success');
-          } else {
-            addToast('Failed to delete analysis', 'error');
-          }
-        }}
+        onConfirm={confirmDelete}
       />
     </DashboardLayout>
   );
 };
 
 export default Dashboard;
+
