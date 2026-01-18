@@ -396,13 +396,13 @@ const Dashboard: React.FC = () => {
             </div>
           ) : (
             /* Empty State - Responsive */
-            <div className="mb-8 sm:mb-12 rounded-xl bg-white dark:bg-gray-800/80 p-8 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
+            <div className="mb-8 sm:mb-12 rounded-xl bg-gray-50/50 dark:bg-gray-800/80 p-8 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
               <div className="flex flex-col items-center justify-center py-8 sm:py-12">
-                <svg className="mb-4 h-12 w-12 sm:h-20 sm:w-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mb-4 h-12 w-12 sm:h-20 sm:w-20 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <h3 className="text-lg font-bold text-gray-100 text-center">No Analyses Yet</h3>
-                <p className="mt-2 text-center text-gray-300 max-w-sm text-sm sm:text-base">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center">No Analyses Yet</h3>
+                <p className="mt-2 text-center text-gray-600 dark:text-gray-300 max-w-sm text-sm sm:text-base">
                   Start your first medical image analysis to see your results here
                 </p>
                 <Link
