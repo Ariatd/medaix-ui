@@ -343,7 +343,7 @@ const Dashboard: React.FC = () => {
                       </thead>
                       <tbody>
                         {recentAnalyses.map(analysis => (
-                          <tr key={analysis.id} className="border-b border-gray-700 hover:bg-gray-800/60 transition">
+                          <tr key={analysis.id} className="border-b border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition">
                             <td className="px-4 py-4 text-sm text-gray-900 dark:text-gray-300 whitespace-nowrap">
                               {new Date(analysis.createdAt).toLocaleDateString()}
                             </td>
