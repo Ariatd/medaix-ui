@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children, showHelp = true }) => {
   const mainMargin = isAuthenticated && isMobile ? 'mb-20' : '';
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-50 dark:bg-gray-900 text-gray-900 dark:text-white">
+    <div className="min-h-screen flex flex-col bg-background-50 dark:bg-gray-900 text-gray-900 dark:text-white overflow-clip">
       <SkipToMainContent />
 
       <Header />

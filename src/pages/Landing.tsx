@@ -48,8 +48,8 @@ const Landing: React.FC = () => {
 
   return (
     <Layout>
-      <div className="w-full overflow-hidden">
-        {/* Landing Page Header - Custom layout for unauthenticated users */}
+      <div className="w-full overflow-clip">
+        {/* Blue Gradient Navbar - Scrolls away naturally */}
         <header className="flex items-center justify-between px-4 sm:px-6 py-2 bg-gradient-to-r from-primary-600 to-blue-700">
           {/* Left - Logo */}
           <span className="text-lg sm:text-xl font-bold text-white">MedAIx</span>
@@ -159,8 +159,6 @@ const Landing: React.FC = () => {
             </nav>
           </div>
         )}
-
-        
 
         {/* SECTION 1: Hero */}
         <motion.section
