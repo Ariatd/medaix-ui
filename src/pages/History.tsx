@@ -31,7 +31,18 @@ const History: React.FC = () => {
     const fetchAnalyses = async () => {
       try {
         const response = await analysisService.getAnalyses();
-        const analyses = response.data.analyses;
+
+        // CRITICAL FIX: API returns data directly like { analyses: [...] }
+        // Add null checks for response structure
+        if (!response) {
+          throw new Error('No response received from analyses API');
+        }
+
+        if (!response.analyses) {
+          console.warn('[History] No analyses property in response:', response);
+        }
+
+        const analyses = response.analyses || [];
         setAllAnalyses(analyses);
         setFilteredAnalyses(analyses);
       } catch (error) {
@@ -110,8 +121,15 @@ const History: React.FC = () => {
       
       // Refresh the list
       const response = await analysisService.getAnalyses();
-      setAllAnalyses(response.data.analyses);
-      setFilteredAnalyses(response.data.analyses);
+
+      // CRITICAL FIX: API returns data directly like { analyses: [...] }
+      if (!response || !response.analyses) {
+        console.warn('[History] No analyses property in refresh response:', response);
+        return;
+      }
+
+      setAllAnalyses(response.analyses);
+      setFilteredAnalyses(response.analyses);
     } catch (error) {
       console.error('Error deleting analysis:', error);
       addToast('Failed to delete analysis', 'error');
