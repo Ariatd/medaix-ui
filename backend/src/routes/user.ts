@@ -1,118 +1,47 @@
-/**
- * User Routes for MedAIx
- * Handles user-related endpoints (tokens, profile, etc.)
- */
-
-import express, { Request, Response } from 'express';
-import { authMiddleware } from '../middleware/auth';
-import {
-  getUserTokens,
-  canUserAnalyze,
-  grantTokens,
-  upgradeToPro,
-} from '../services/tokenService';
-import { asyncHandler, createError } from '../middleware/errorHandler';
+import express from 'express';
+import { prisma } from '../server';
+import { protect } from '../middleware/auth';
+import { getUserTokenStats } from '../services/tokenService';
 
 const router = express.Router();
 
-/**
- * GET /api/user/tokens
- * @desc    Get current user's token balance
- * @access  Private (requires JWT token)
- */
-router.get('/tokens', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.userId;
+// @route   GET /api/user/profile
+// @desc    Get current user profile
+// @access  Private
+router.get('/profile', protect, async (req: any, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        institution: true,
+        department: true,
+        avatar: true,
+        createdAt: true
+      }
+    });
 
-  if (!userId) {
-    throw createError('User ID not found in token', 400);
-  }
-
-  const tokenStatus = await getUserTokens(userId);
-
-  res.json({
-    success: true,
-    data: {
-      tokensTotal: tokenStatus.tokensTotal ?? 0,
-      tokensUsedToday: tokenStatus.tokensUsedToday ?? 0,
-      isPro: tokenStatus.isPro ?? false,
-      tokenLastResetDate: tokenStatus.tokenLastResetDate,
-    },
-  });
-}));
-
-/**
- * GET /api/user/can-analyze
- * @desc    Check if user can perform analysis
- * @access  Private (requires JWT token)
- */
-router.get('/can-analyze', authMiddleware, asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.userId;
-
-  if (!userId) {
-    throw createError('User ID not found in token', 400);
-  }
-
-  const result = await canUserAnalyze(userId);
-
-  res.json({
-    success: true,
-    data: result,
-  });
-}));
-
-/**
- * POST /api/user/grant-tokens
- * @desc    Grant bonus tokens to user (admin only)
- * @access  Private (admin only)
- */
-router.post(
-  '/grant-tokens',
-  authMiddleware,
-  asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.userId;
-    const { amount } = req.body;
-
-    if (!userId) {
-      throw createError('User ID not found in token', 400);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    if (!amount || amount < 1) {
-      throw createError('Amount must be at least 1', 400);
-    }
-
-    const result = await grantTokens(userId, amount);
+    // Token istatistiklerini servisten (sahte veriden) al
+    const tokenStats = await getUserTokenStats(req.user.id);
 
     res.json({
       success: true,
-      message: `Granted ${amount} tokens`,
-      data: result,
+      user: {
+        ...user,
+        ...tokenStats // Fake token verilerini ekle
+      }
     });
-  })
-);
-
-/**
- * POST /api/user/upgrade-pro
- * @desc    Upgrade user to Pro (payment processing in real app)
- * @access  Private
- */
-router.post(
-  '/upgrade-pro',
-  authMiddleware,
-  asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.userId;
-
-    if (!userId) {
-      throw createError('User ID not found in token', 400);
-    }
-
-    const result = await upgradeToPro(userId);
-
-    res.json({
-      success: true,
-      message: 'Upgraded to Pro',
-      data: result,
-    });
-  })
-);
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 export default router;

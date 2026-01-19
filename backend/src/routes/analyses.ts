@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import { prisma } from '../server';
 import { getAnalysisResult, AnalysisResult as InferenceAnalysisResult } from '../services/inference';
-
+// Render deploy tetikleme denemesi v2
 const router = express.Router();
 
 // Analysis type definition matching Prisma schema
@@ -154,6 +154,68 @@ const mockAnalyses: AnalysisRecord[] = [
   }
 ];
 
+
+router.get('/image/:id', asyncHandler(async (req: Request, res: Response) => {
+  console.log('HIT: /image/:id endpoint called');
+  const { id } = req.params;
+
+  // Try to get from database first
+  try {
+    const dbAnalysis = await prisma.researchAnalysis.findFirst({
+      where: { imageId: id },
+      include: {
+        image: {
+          select: {
+            originalFileName: true,
+            fileSize: true,
+            mimeType: true,
+            imageType: true,
+            createdAt: true
+          }
+        },
+        analyst: {
+          select: {
+            id: true,
+            email: true,
+            name: true
+          }
+        }
+      }
+    });
+
+    if (dbAnalysis) {
+      // Get full result from inference service
+      const fullResult = await getAnalysisResult(id);
+      
+      // Transform database result to match frontend expectations
+      const result = transformAnalysisForFrontend(dbAnalysis, fullResult);
+
+      // Return response WITHOUT data wrapper
+      res.json({
+        success: true,
+        analysis: result
+      });
+      return;
+    }
+  } catch (error) {
+    console.error('Error fetching analysis from database:', error);
+  }
+
+  // Fallback to mock data if not found in database
+  const mockAnalysis = mockAnalyses.find(a => a.id === id);
+
+  if (!mockAnalysis) {
+    throw createError('Analysis not found', 404);
+  }
+
+  // Return response WITHOUT data wrapper
+  res.json({
+    success: true,
+    analysis: transformAnalysisForFrontend(mockAnalysis, null)
+  });
+}));
+
+
 // @route   GET /api/analyses
 // @desc    Get analyses with filtering and pagination
 // @access  Private
@@ -220,10 +282,10 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
 
   try {
     // Get total count for pagination from database
-    const total = await prisma.ResearchAnalysis.count({ where });
+    const total = await prisma.researchAnalysis.count({ where });
 
     // Get paginated results from database
-    const analyses = await prisma.ResearchAnalysis.findMany({
+    const analyses = await prisma.researchAnalysis.findMany({
       where,
       include: {
         image: {
@@ -320,6 +382,11 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
   }
 }));
 
+// @route   GET /api/analyses/image/:id
+// @desc    Get analysis result by image ID
+// @access  Private
+
+
 // @route   POST /api/analyses
 // @desc    Create new analysis and save to database
 // @access  Private
@@ -341,7 +408,7 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
 
   try {
     // Save analysis to Prisma database
-    const newAnalysis = await prisma.ResearchAnalysis.create({
+    const newAnalysis = await prisma.researchAnalysis.create({
       data: {
         id: analysisId,
         projectId: projectId || null,
@@ -386,68 +453,6 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
   }
 }));
 
-// @route   GET /api/analyses/image/:id
-// @desc    Get analysis result by image ID
-// @access  Private
-router.get('/image/:id', asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  // Try to get from database first
-  try {
-    const dbAnalysis = await prisma.ResearchAnalysis.findFirst({
-      where: { imageId: id },
-      include: {
-        image: {
-          select: {
-            originalFileName: true,
-            fileSize: true,
-            mimeType: true,
-            imageType: true,
-            createdAt: true
-          }
-        },
-        analyst: {
-          select: {
-            id: true,
-            email: true,
-            name: true
-          }
-        }
-      }
-    });
-
-    if (dbAnalysis) {
-      // Get full result from inference service
-      const fullResult = await getAnalysisResult(id);
-      
-      // Transform database result to match frontend expectations
-      const result = transformAnalysisForFrontend(dbAnalysis, fullResult);
-
-      // Return response WITHOUT data wrapper
-      res.json({
-        success: true,
-        analysis: result
-      });
-      return;
-    }
-  } catch (error) {
-    console.error('Error fetching analysis from database:', error);
-  }
-
-  // Fallback to mock data if not found in database
-  const mockAnalysis = mockAnalyses.find(a => a.id === id);
-
-  if (!mockAnalysis) {
-    throw createError('Analysis not found', 404);
-  }
-
-  // Return response WITHOUT data wrapper
-  res.json({
-    success: true,
-    analysis: transformAnalysisForFrontend(mockAnalysis, null)
-  });
-}));
-
 // @route   GET /api/analyses/:id
 // @desc    Get specific analysis by analysis ID
 // @access  Private
@@ -456,7 +461,7 @@ router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
 
   // Try to get from database first
   try {
-    const dbAnalysis = await prisma.ResearchAnalysis.findUnique({
+    const dbAnalysis = await prisma.researchAnalysis.findUnique({
       where: { id },
       include: {
         image: {
@@ -521,7 +526,7 @@ router.patch('/:id', asyncHandler(async (req: Request, res: Response) => {
 
   try {
     // Try to update in database
-    const updatedAnalysis = await prisma.ResearchAnalysis.update({
+    const updatedAnalysis = await prisma.researchAnalysis.update({
       where: { id },
       data: {
         ...updates,
@@ -577,7 +582,7 @@ router.post('/:id/complete', asyncHandler(async (req: Request, res: Response) =>
 
   try {
     // Try to update in database
-    const updatedAnalysis = await prisma.ResearchAnalysis.update({
+    const updatedAnalysis = await prisma.researchAnalysis.update({
       where: { id },
       data: {
         status: 'completed',
@@ -640,7 +645,7 @@ router.post('/:id/fail', asyncHandler(async (req: Request, res: Response) => {
 
   try {
     // Try to update in database
-    const updatedAnalysis = await prisma.ResearchAnalysis.update({
+    const updatedAnalysis = await prisma.researchAnalysis.update({
       where: { id },
       data: {
         status: 'failed',
@@ -690,7 +695,7 @@ router.get('/user/:userId/statistics', asyncHandler(async (req: Request, res: Re
 
   try {
     // Get statistics from database
-    const userAnalyses = await prisma.ResearchAnalysis.findMany({
+    const userAnalyses = await prisma.researchAnalysis.findMany({
       where: { analystId: userId }
     });
 
@@ -788,7 +793,7 @@ router.delete('/:id', asyncHandler(async (req: Request, res: Response) => {
 
   try {
     // Try to delete from database
-    await prisma.ResearchAnalysis.delete({
+    await prisma.researchAnalysis.delete({
       where: { id }
     });
 
