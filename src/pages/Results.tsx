@@ -34,6 +34,7 @@ const Results: React.FC = () => {
   useEffect(() => {
     // Handle new uploads from navigation state
     if (navigationData?.analysis) {
+      console.log('[Results] Loading analysis from navigation state');
       setAnalysis(navigationData.analysis);
       setValidationResult(navigationData.validationResult || null);
       setLoading(false);
@@ -49,13 +50,31 @@ const Results: React.FC = () => {
 
     const fetchAnalysis = async () => {
       try {
+        console.log('[Results] Fetching analysis for id:', id);
         const response = await analysisService.getAnalysis(id);
+        
+        // CRITICAL FIX: Add null checks for response structure
+        if (!response) {
+          console.error('[Results] Empty response from getAnalysis');
+          setError('No response from server');
+          return;
+        }
+        
+        if (!response.data) {
+          console.error('[Results] Missing data in response:', response);
+          setError('Invalid response: missing data');
+          return;
+        }
+        
         if (!response.data.analysis) {
+          console.error('[Results] Missing analysis in response:', response);
           setError('Analysis not found');
         } else {
+          console.log('[Results] Analysis loaded successfully:', response.data.analysis.id);
           setAnalysis(response.data.analysis);
         }
       } catch (err) {
+        console.error('[Results] Error fetching analysis:', err);
         setError(err instanceof Error ? err.message : 'Failed to load analysis');
       } finally {
         setLoading(false);
@@ -63,6 +82,7 @@ const Results: React.FC = () => {
     };
 
     fetchAnalysis();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, navigationData]);
 
     if (loading) {

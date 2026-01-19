@@ -169,21 +169,68 @@ export const analysisService = {
    * Get all analyses for the current user
    */
   async getAnalyses(): Promise<GetAnalysesResponse> {
-    return apiClient.get('/analyses');
+    try {
+      const response = await apiClient.get('/analyses');
+      
+      // Validate response structure
+      if (!response || typeof response !== 'object') {
+        console.error('[analysisService] Invalid getAnalyses response:', response);
+        throw new Error('Invalid response from server');
+      }
+      
+      return response as GetAnalysesResponse;
+    } catch (error) {
+      console.error('[analysisService] Error fetching analyses:', error);
+      throw error;
+    }
   },
 
   /**
    * Get a single analysis by ID
    */
   async getAnalysis(id: string): Promise<GetAnalysisResponse> {
-    return apiClient.get(`/analyses/${id}`);
+    try {
+      const response = await apiClient.get(`/analyses/${id}`);
+      
+      // Validate response structure
+      if (!response || typeof response !== 'object') {
+        console.error('[analysisService] Invalid getAnalysis response:', response);
+        throw new Error('Invalid response from server');
+      }
+      
+      return response as GetAnalysisResponse;
+    } catch (error) {
+      console.error('[analysisService] Error fetching analysis:', error);
+      throw error;
+    }
   },
 
   /**
    * Get analysis result (polls until completion)
    */
   async getAnalysisResult(imageId: string): Promise<AnalysisResultResponse> {
-    return apiClient.get(`/analyses/image/${imageId}`);
+    try {
+      const response = await apiClient.get(`/analyses/image/${imageId}`);
+      
+      // Validate response structure - CRITICAL FIX for production
+      if (!response) {
+        console.error('[analysisService] Empty response for imageId:', imageId);
+        throw new Error('No response received from server');
+      }
+      
+      if (typeof response !== 'object') {
+        console.error('[analysisService] Invalid response type:', typeof response, response);
+        throw new Error('Invalid response format from server');
+      }
+      
+      // Log response for debugging in production
+      console.log('[analysisService] getAnalysisResult response:', JSON.stringify(response, null, 2));
+      
+      return response as AnalysisResultResponse;
+    } catch (error) {
+      console.error('[analysisService] Error fetching analysis result:', error);
+      throw error;
+    }
   },
 
   /**

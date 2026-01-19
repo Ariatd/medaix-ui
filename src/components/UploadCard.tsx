@@ -125,11 +125,36 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
       // Upload the image to the backend
       const uploadResponse = await uploadService.uploadImage(selectedFile, currentUser.id);
 
+      // DEBUG: Log full response for production debugging
+      console.log('[UploadCard] Upload response:', JSON.stringify(uploadResponse, null, 2));
+
+      // Validate upload response structure
+      if (!uploadResponse) {
+        throw new Error('No response received from server');
+      }
+
       if (!uploadResponse.success) {
         throw new Error(uploadResponse.data?.message || 'Upload failed');
       }
 
+      // CRITICAL FIX: Add null checks for data and image properties
+      if (!uploadResponse.data) {
+        console.error('[UploadCard] Missing data in upload response:', uploadResponse);
+        throw new Error('Invalid response: missing data');
+      }
+
+      if (!uploadResponse.data.image) {
+        console.error('[UploadCard] Missing image in upload response:', uploadResponse);
+        throw new Error('Invalid response: missing image data');
+      }
+
+      if (!uploadResponse.data.image.id) {
+        console.error('[UploadCard] Missing image ID in upload response:', uploadResponse);
+        throw new Error('Invalid response: missing image ID');
+      }
+
       const imageId = uploadResponse.data.image.id;
+      console.log('[UploadCard] Upload successful, imageId:', imageId);
 
       // Poll for analysis completion
       let analysisResult = null;
@@ -140,14 +165,26 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
         try {
           const response = await analysisService.getAnalysisResult(imageId);
 
+          // DEBUG: Log polling response
+          console.log(`[UploadCard] Poll attempt ${attempts + 1}:`, JSON.stringify(response, null, 2));
+
           // The API returns { success: true, data: { analysis: {...} } }
           // So we need to access response.data.analysis
           analysisResult = response?.data?.analysis;
 
-          if (analysisResult && analysisResult.status === 'completed') {
+          if (!analysisResult) {
+            console.warn(`[UploadCard] No analysis result yet, attempt ${attempts + 1}`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            attempts++;
+            continue;
+          }
+
+          if (analysisResult.status === 'completed') {
+            console.log('[UploadCard] Analysis completed:', analysisResult.id);
             break;
-          } else if (analysisResult && analysisResult.status === 'failed') {
-            throw new Error('Analysis failed');
+          } else if (analysisResult.status === 'failed') {
+            console.error('[UploadCard] Analysis failed:', analysisResult.error);
+            throw new Error(analysisResult.error || 'Analysis failed');
           }
 
           // Wait 1 second before next attempt
@@ -156,10 +193,12 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
         } catch (pollError) {
           // If it's a 404, the analysis might not be ready yet
           if (pollError instanceof Error && pollError.message.includes('404')) {
+            console.warn(`[UploadCard] 404 on attempt ${attempts + 1}, retrying...`);
             await new Promise(resolve => setTimeout(resolve, 1000));
             attempts++;
             continue;
           }
+          console.error('[UploadCard] Polling error:', pollError);
           throw pollError;
         }
       }
@@ -179,6 +218,7 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
       navigate(`/results/${encodeURIComponent(analysisResult.id)}`);
 
     } catch (err) {
+      console.error('[UploadCard] Error during analysis:', err);
       setError(err instanceof Error ? err.message : 'Failed to analyze file.');
     } finally {
       setIsAnalyzing(false);

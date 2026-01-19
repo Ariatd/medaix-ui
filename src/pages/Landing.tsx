@@ -50,7 +50,7 @@ const Landing: React.FC = () => {
     <Layout>
       <div className="w-full overflow-hidden">
         {/* Landing Page Header - Custom layout for unauthenticated users */}
-        <header className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-primary-600 to-blue-700 relative">
+        <header className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-primary-600 to-blue-700">
           {/* Left - Logo */}
           <span className="text-lg sm:text-xl font-bold text-white">MedAIx</span>
 
