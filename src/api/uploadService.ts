@@ -7,20 +7,18 @@ import { apiClient } from './apiClient';
 
 export interface UploadImageResponse {
   success: boolean;
-  data: {
-    image: {
-      id: string;
-      fileName: string;
-      originalFileName: string | null;
-      fileSize: string | null | undefined;
-      mimeType: string | null | undefined;
-      imageType: string | null | undefined;
-      analysisStatus: string;
-      createdAt: string;
-      updatedAt: string;
-    };
-    message: string;
+  image: {
+    id: string;
+    fileName: string;
+    originalFileName: string | null;
+    fileSize: string | null | undefined;
+    mimeType: string | null | undefined;
+    imageType: string | null | undefined;
+    analysisStatus: string;
+    createdAt: string;
+    updatedAt: string;
   };
+  message: string;
 }
 
 export const uploadService = {

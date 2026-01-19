@@ -134,26 +134,21 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
       }
 
       if (!uploadResponse.success) {
-        throw new Error(uploadResponse.data?.message || 'Upload failed');
+        throw new Error(uploadResponse.message || 'Upload failed');
       }
 
-      // CRITICAL FIX: Add null checks for data and image properties
-      if (!uploadResponse.data) {
-        console.error('[UploadCard] Missing data in upload response:', uploadResponse);
-        throw new Error('Invalid response: missing data');
-      }
-
-      if (!uploadResponse.data.image) {
+      // CRITICAL FIX: Add null checks for image property (response structure: { success, image, message })
+      if (!uploadResponse.image) {
         console.error('[UploadCard] Missing image in upload response:', uploadResponse);
-        throw new Error('Invalid response: missing image data');
+        throw new Error('Invalid response: missing image');
       }
 
-      if (!uploadResponse.data.image.id) {
+      if (!uploadResponse.image.id) {
         console.error('[UploadCard] Missing image ID in upload response:', uploadResponse);
         throw new Error('Invalid response: missing image ID');
       }
 
-      const imageId = uploadResponse.data.image.id;
+      const imageId = uploadResponse.image.id;
       console.log('[UploadCard] Upload successful, imageId:', imageId);
 
       // Poll for analysis completion
