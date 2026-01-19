@@ -110,9 +110,7 @@ export interface GetAnalysesResponse {
 
 export interface GetAnalysisResponse {
   success: boolean;
-  data: {
-    analysis: AnalysisResult;
-  };
+  analysis: AnalysisResult;
 }
 
 export interface CreateAnalysisResponse {
@@ -129,21 +127,19 @@ export interface CreateAnalysisResponse {
 
 export interface AnalysisResultResponse {
   success: boolean;
-  data: {
-    analysis: {
+  analysis: {
+    id: string;
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    image?: {
       id: string;
-      status: 'pending' | 'processing' | 'completed' | 'failed';
-      image?: {
-        id: string;
-        fileName: string;
-        imageType: string;
-      };
-      findings?: any[];
-      confidence?: number;
-      createdAt: string;
-      completedAt?: string;
-      error?: string;
+      fileName: string;
+      imageType: string;
     };
+    findings?: any[];
+    confidence?: number;
+    createdAt: string;
+    completedAt?: string;
+    error?: string;
   };
 }
 
@@ -184,9 +180,9 @@ export const analysisService = {
   /**
    * Get a single analysis by ID
    */
-  async getAnalysis(id: string): Promise<GetAnalysisResponse> {
+  async getAnalysis(id: string): Promise<AnalysisResult> {
     try {
-      const response = await apiClient.get(`/analyses/${id}`);
+      const response = await apiClient.get<GetAnalysisResponse>(`/analyses/${id}`);
       
       // Validate response structure
       if (!response || typeof response !== 'object') {
@@ -194,7 +190,14 @@ export const analysisService = {
         throw new Error('Invalid response from server');
       }
       
-      return response as GetAnalysisResponse;
+      // Backend returns { success: boolean; analysis: {...} }
+      // Extract the analysis directly from the response
+      if (!response.analysis) {
+        console.error('[analysisService] Missing analysis in response:', response);
+        throw new Error('Analysis not found in response');
+      }
+      
+      return response.analysis;
     } catch (error) {
       console.error('[analysisService] Error fetching analysis:', error);
       throw error;
@@ -203,10 +206,11 @@ export const analysisService = {
 
   /**
    * Get analysis result (polls until completion)
+   * Returns the analysis object directly from { success: boolean; analysis: {...} }
    */
-  async getAnalysisResult(imageId: string): Promise<AnalysisResultResponse> {
+  async getAnalysisResult(imageId: string): Promise<AnalysisResult> {
     try {
-      const response = await apiClient.get(`/analyses/image/${imageId}`);
+      const response = await apiClient.get<AnalysisResultResponse>(`/analyses/image/${imageId}`);
       
       // Validate response structure - CRITICAL FIX for production
       if (!response) {
@@ -219,10 +223,17 @@ export const analysisService = {
         throw new Error('Invalid response format from server');
       }
       
+      // Backend returns { success: boolean; analysis: {...} }
+      // Extract the analysis directly from the response
+      if (!response.analysis) {
+        console.error('[analysisService] Missing analysis in response:', response);
+        throw new Error('Analysis not found in response');
+      }
+      
       // Log response for debugging in production
       console.log('[analysisService] getAnalysisResult response:', JSON.stringify(response, null, 2));
       
-      return response as AnalysisResultResponse;
+      return response.analysis as AnalysisResult;
     } catch (error) {
       console.error('[analysisService] Error fetching analysis result:', error);
       throw error;

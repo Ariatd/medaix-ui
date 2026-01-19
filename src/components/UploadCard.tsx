@@ -163,9 +163,9 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
           // DEBUG: Log polling response
           console.log(`[UploadCard] Poll attempt ${attempts + 1}:`, JSON.stringify(response, null, 2));
 
-          // The API returns { success: true, data: { analysis: {...} } }
-          // So we need to access response.data.analysis
-          analysisResult = response?.data?.analysis;
+          // The API returns { success: true, analysis: {...} }
+          // getAnalysisResult() now returns the analysis object directly
+          analysisResult = response;
 
           if (!analysisResult) {
             console.warn(`[UploadCard] No analysis result yet, attempt ${attempts + 1}`);
