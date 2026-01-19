@@ -16,8 +16,8 @@ const Header: React.FC = () => {
   const isDocumentation = location.pathname === '/documentation';
 
   return (
-    <header className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-40">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-8 py-4">
+    <header className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-8 py-2">
 
 
         {/* Logo */}
