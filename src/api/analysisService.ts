@@ -91,22 +91,20 @@ export interface AnalysisResult {
 
 export interface GetAnalysesResponse {
   success: boolean;
-  data: {
-    analyses: AnalysisResult[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      pages: number;
-    };
-    summary?: {
-      totalAnalyses: number;
-      completedAnalyses: number;
-      pendingAnalyses: number;
-      failedAnalyses: number;
-      successRate: number;
-      avgConfidence: number;
-    };
+  analyses: AnalysisResult[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+  summary?: {
+    totalAnalyses: number;
+    completedAnalyses: number;
+    pendingAnalyses: number;
+    failedAnalyses: number;
+    successRate: number;
+    avgConfidence: number;
   };
 }
 
@@ -151,16 +149,14 @@ export interface AnalysisResultResponse {
 
 export interface StatisticsResponse {
   success: boolean;
-  data: {
-    statistics: {
-      totalAnalyses: number;
-      successRate: number;
-      thisMonth: number;
-      avgConfidence: number;
-      completedAnalyses: number;
-      failedAnalyses: number;
-      pendingAnalyses: number;
-    };
+  statistics: {
+    totalAnalyses: number;
+    successRate: number;
+    thisMonth: number;
+    avgConfidence: number;
+    completedAnalyses: number;
+    failedAnalyses: number;
+    pendingAnalyses: number;
   };
 }
 

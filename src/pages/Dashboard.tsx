@@ -46,8 +46,19 @@ const Dashboard: React.FC = () => {
         
         // Fetch analyses from API (same endpoint as History page)
         const analysesResponse = await analysisService.getAnalyses();
-        const fetchedAnalyses = analysesResponse.data.analyses || [];
-        
+
+        // CRITICAL FIX: API returns data directly like { analyses: [...] }
+        // Add null checks for response structure
+        if (!analysesResponse) {
+          throw new Error('No response received from analyses API');
+        }
+
+        if (!analysesResponse.analyses) {
+          console.warn('[Dashboard] No analyses property in response:', analysesResponse);
+        }
+
+        const fetchedAnalyses = analysesResponse.analyses || [];
+
         // Sort by date (newest first) and get last 5
         const sortedAnalyses = [...fetchedAnalyses].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -56,7 +67,19 @@ const Dashboard: React.FC = () => {
 
         // Fetch statistics from API
         const statsResponse = await analysisService.getStatistics(currentUser.id);
-        const statistics = statsResponse.data.statistics;
+
+        // CRITICAL FIX: API returns data directly like { statistics: {...} }
+        // Add null checks for response structure
+        if (!statsResponse) {
+          throw new Error('No response received from statistics API');
+        }
+
+        if (!statsResponse.statistics) {
+          console.warn('[Dashboard] No statistics property in response:', statsResponse);
+          throw new Error('Invalid statistics response structure');
+        }
+
+        const statistics = statsResponse.statistics;
         
         setStats({
           totalAnalyses: statistics.totalAnalyses || 0,
