@@ -177,7 +177,7 @@ router.post('/image', upload.single('image'), asyncHandler(async (req: Request, 
     }
   });
 
-  // Start analysis asynchronously
+
   setTimeout(async () => {
     try {
       await analyzeImage(imageId, uploadedFile.buffer);

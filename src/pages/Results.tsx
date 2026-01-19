@@ -53,7 +53,7 @@ const Results: React.FC = () => {
         console.log('[Results] Fetching analysis for id:', id);
         const response = await analysisService.getAnalysis(id);
         
-        // CRITICAL FIX: API returns data directly like { analysis: {...} }
+        // CRITICAL FIX: API returns data wrapped like { success: true, data: { analysis: {...} } }
         // Add null checks for response structure
         if (!response) {
           console.error('[Results] Empty response from getAnalysis');
@@ -61,14 +61,20 @@ const Results: React.FC = () => {
           return;
         }
 
-        if (!response.analysis) {
+        if (!response.data) {
+          console.error('[Results] Missing data in response:', response);
+          setError('Invalid response: missing data');
+          return;
+        }
+
+        if (!response.data.analysis) {
           console.error('[Results] Missing analysis in response:', response);
           setError('Analysis not found');
           return;
         }
 
-        console.log('[Results] Analysis loaded successfully:', response.analysis.id);
-        setAnalysis(response.analysis);
+        console.log('[Results] Analysis loaded successfully:', response.data.analysis.id);
+        setAnalysis(response.data.analysis);
       } catch (err) {
         console.error('[Results] Error fetching analysis:', err);
         setError(err instanceof Error ? err.message : 'Failed to load analysis');

@@ -110,7 +110,9 @@ export interface GetAnalysesResponse {
 
 export interface GetAnalysisResponse {
   success: boolean;
-  analysis: AnalysisResult;
+  data: {
+    analysis: AnalysisResult;
+  };
 }
 
 export interface CreateAnalysisResponse {
