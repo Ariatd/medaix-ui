@@ -190,14 +190,15 @@ export const analysisService = {
         throw new Error('Invalid response from server');
       }
       
-      // Backend returns { success: boolean; analysis: {...} }
-      // Extract the analysis directly from the response
-      if (!response.analysis) {
+      // Handle both wrapped ({ success: boolean; analysis: {...} }) and unwrapped ({ id: "...", ... }) responses
+      const analysisData = response.analysis || response;
+      
+      if (!analysisData || !analysisData.id) {
         console.error('[analysisService] Missing analysis in response:', response);
         throw new Error('Analysis not found in response');
       }
       
-      return response.analysis;
+      return analysisData;
     } catch (error) {
       console.error('[analysisService] Error fetching analysis:', error);
       throw error;
@@ -223,9 +224,10 @@ export const analysisService = {
         throw new Error('Invalid response format from server');
       }
       
-      // Backend returns { success: boolean; analysis: {...} }
-      // Extract the analysis directly from the response
-      if (!response.analysis) {
+      // Handle both wrapped ({ success: boolean; analysis: {...} }) and unwrapped ({ id: "...", ... }) responses
+      const analysisData = response.analysis || response;
+      
+      if (!analysisData || !analysisData.id) {
         console.error('[analysisService] Missing analysis in response:', response);
         throw new Error('Analysis not found in response');
       }
@@ -233,7 +235,7 @@ export const analysisService = {
       // Log response for debugging in production
       console.log('[analysisService] getAnalysisResult response:', JSON.stringify(response, null, 2));
       
-      return response.analysis as AnalysisResult;
+      return analysisData as AnalysisResult;
     } catch (error) {
       console.error('[analysisService] Error fetching analysis result:', error);
       throw error;
