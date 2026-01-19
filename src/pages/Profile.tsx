@@ -216,9 +216,9 @@ const Profile: React.FC = () => {
 
             {/* RIGHT COLUMN (Wider - 2 cols) */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Profile Information Card */}
-              <div className="rounded-xl bg-white dark:bg-gray-800/80 p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between mb-6">
+            {/* Profile Information Card */}
+              <div className="rounded-xl bg-white dark:bg-gray-800/80 py-4 px-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Profile Information</h2>
                   {!isEditing && (
                     <button
@@ -252,7 +252,7 @@ const Profile: React.FC = () => {
                   </div>
                   
                   {isEditing ? (
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex gap-4 pt-2">
                       <button
                         onClick={handleSave}
                         disabled={isSaving}
@@ -268,17 +268,18 @@ const Profile: React.FC = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="border-t border-gray-200 dark:border-gray-700 mt-2 mb-2 w-full"></div>
                       <button
                         onClick={() => setShowPasswordModal(true)}
-                        className="rounded-lg bg-gray-700/60 px-4 py-2 font-semibold text-gray-100 transition hover:bg-gray-700"
+                        className="rounded-lg bg-gray-700/60 px-4 py-2 font-semibold text-gray-100 transition hover:bg-gray-700 w-fit"
                       >
                         Change Password
                       </button>
                     </div>
                   )}
                 </div>
-              </div>              {/* Current Plan Card */}
+              </div>
               <div className="rounded-xl bg-white dark:bg-gray-800/80 p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 bg-primary-900/30 p-3 rounded-lg">
