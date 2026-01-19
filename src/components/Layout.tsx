@@ -27,9 +27,10 @@ const Layout: React.FC<LayoutProps> = ({ children, showHelp = true }) => {
       {/* DEĞİŞİKLİK BURADA: 'pt-20' eklendi. Bu, içeriği 80px aşağı iter. */}
       <main id="main-content" className={`flex-1 w-full pt-20 ${mainMargin}`}>
         {children}
+        
+        {/* Footer - Inside scrollable area */}
+        <Footer />
       </main>
-
-      <Footer />
 
       {showHelp && <HelpSupport />}
     </div>

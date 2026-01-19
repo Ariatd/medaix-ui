@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useIsTabletOrSmaller } from '../hooks/useDeviceType';
+import Logo from './Logo';
 
 interface SidebarProps {
   className?: string;
@@ -98,10 +99,18 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
               ? 'translate-x-0' 
               : '-translate-x-full lg:translate-x-0'
             : 'translate-x-0'
-        } pt-16 overflow-y-auto ${className}`}
+        } pt-0 overflow-y-auto ${className}`}
       >
+        {/* MedAIx Blue Branding Header - extends to full width */}
+        <div className="bg-primary-600 p-4 flex items-center gap-3">
+          <button onClick={() => window.location.reload()} className="flex items-center gap-3 text-white">
+            <Logo size={32} />
+            <span className="font-bold text-lg">MedAIx</span>
+          </button>
+        </div>
+
         {/* User Profile Section */}
-        <div className="p-4">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <Link to="/profile" className="flex items-center gap-3 rounded-md p-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
             <img
               src={currentUser?.avatar || `https://ui-avatars.com/api/?name=${currentUser?.name || 'User'}&background=0066CC&color=fff`}
