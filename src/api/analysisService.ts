@@ -5,7 +5,7 @@
 
 import { apiClient } from './apiClient';
 
-// Analysis Result type (defined locally to avoid import issues)
+// --- TİPLER AYNI KALDI (Değiştirilmedi) ---
 export interface Finding {
   id: string;
   description: string;
@@ -156,96 +156,92 @@ export interface StatisticsResponse {
   };
 }
 
+// --- DEMO VERİLERİ (Taklit için kullanılacak) ---
+const MOCK_ANALYSIS: AnalysisResult = {
+  id: 'demo_analysis_1',
+  status: 'completed',
+  confidenceScore: 98.4,
+  confidenceLevel: 'very_high',
+  findings: [
+    { id: 'f1', description: 'Normal pulmonary patterns detected', region: 'Right Lung', confidence: 99, severity: 'normal' }
+  ],
+  recommendations: ['Routine follow-up in 12 months'],
+  differentialDiagnosis: [{ condition: 'Healthy Appearance', probability: 99.5, reasoning: 'Clear visibility' }],
+  severityAssessment: { overallSeverity: 'normal', affectedRegions: [], urgencyLevel: 'routine', recommendedActions: [] },
+  regionsOfInterest: [],
+  qualityMetrics: { imageQuality: 0.95, completeness: 1.0, clarity: 0.98, artifactLevel: 'none' },
+  processingTimeSeconds: 2.4,
+  metadata: { 
+    algorithmVersion: 'v2.1.0-demo', 
+    modelUsed: 'MedAIx-Demo-Core', 
+    processingNode: 'demo-node-01', 
+    batchId: 'demo-batch-001',
+    confidenceThresholds: { primary: 0.8, secondary: 0.85, final: 0.9 }
+  },
+  createdAt: new Date().toISOString()
+};
+
 export const analysisService = {
   /**
    * Get all analyses for the current user
    */
   async getAnalyses(): Promise<GetAnalysesResponse> {
+    if (import.meta.env.VITE_IS_DEMO === 'true') {
+      return {
+        success: true,
+        analyses: [MOCK_ANALYSIS],
+        pagination: { page: 1, limit: 10, total: 1, pages: 1 },
+        summary: { totalAnalyses: 1, completedAnalyses: 1, pendingAnalyses: 0, failedAnalyses: 0, successRate: 100, avgConfidence: 98.4 }
+      };
+    }
     try {
       const response = await apiClient.get('/analyses');
-      
-      // Validate response structure
-      if (!response || typeof response !== 'object') {
-        console.error('[analysisService] Invalid getAnalyses response:', response);
-        throw new Error('Invalid response from server');
-      }
-      
+      if (!response || typeof response !== 'object') throw new Error('Invalid response');
       return response as GetAnalysesResponse;
-    } catch (error) {
-      console.error('[analysisService] Error fetching analyses:', error);
-      throw error;
-    }
+    } catch (error) { throw error; }
   },
 
   /**
    * Get a single analysis by ID
    */
   async getAnalysis(id: string): Promise<AnalysisResult> {
+    if (import.meta.env.VITE_IS_DEMO === 'true') return MOCK_ANALYSIS;
     try {
       const response = await apiClient.get<GetAnalysisResponse>(`/analyses/${id}`);
-      
-      // Validate response structure
-      if (!response || typeof response !== 'object') {
-        console.error('[analysisService] Invalid getAnalysis response:', response);
-        throw new Error('Invalid response from server');
-      }
-      
-      // Handle both wrapped ({ success: boolean; analysis: {...} }) and unwrapped ({ id: "...", ... }) responses
       const analysisData = response.analysis || response;
-      
-      if (!analysisData || !analysisData.id) {
-        console.error('[analysisService] Missing analysis in response:', response);
-        throw new Error('Analysis not found in response');
-      }
-      
+      if (!analysisData || !analysisData.id) throw new Error('Analysis not found');
       return analysisData;
-    } catch (error) {
-      console.error('[analysisService] Error fetching analysis:', error);
-      throw error;
-    }
+    } catch (error) { throw error; }
   },
 
   /**
    * Get analysis result (polls until completion)
-   * Returns the analysis object directly from { success: boolean; analysis: {...} }
    */
   async getAnalysisResult(imageId: string): Promise<AnalysisResult> {
+    if (import.meta.env.VITE_IS_DEMO === 'true') {
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Analiz ediliyormuş gibi beklet
+      return MOCK_ANALYSIS;
+    }
     try {
       const response = await apiClient.get<AnalysisResultResponse>(`/analyses/image/${imageId}`);
-      
-      // Validate response structure - CRITICAL FIX for production
-      if (!response) {
-        console.error('[analysisService] Empty response for imageId:', imageId);
-        throw new Error('No response received from server');
-      }
-      
-      if (typeof response !== 'object') {
-        console.error('[analysisService] Invalid response type:', typeof response, response);
-        throw new Error('Invalid response format from server');
-      }
-      
-      // Handle both wrapped ({ success: boolean; analysis: {...} }) and unwrapped ({ id: "...", ... }) responses
+      if (!response) throw new Error('No response');
       const analysisData = response.analysis || response;
-      
-      if (!analysisData || !analysisData.id) {
-        console.error('[analysisService] Missing analysis in response:', response);
-        throw new Error('Analysis not found in response');
-      }
-      
-      // Log response for debugging in production
-      console.log('[analysisService] getAnalysisResult response:', JSON.stringify(response, null, 2));
-      
+      if (!analysisData || !analysisData.id) throw new Error('Analysis not found');
       return analysisData as AnalysisResult;
-    } catch (error) {
-      console.error('[analysisService] Error fetching analysis result:', error);
-      throw error;
-    }
+    } catch (error) { throw error; }
   },
 
   /**
    * Create a new analysis
    */
   async createAnalysis(imageId: string): Promise<CreateAnalysisResponse> {
+    if (import.meta.env.VITE_IS_DEMO === 'true') {
+      return {
+        success: true,
+        data: { analysis: { id: 'demo_analysis_1', status: 'processing', createdAt: new Date().toISOString() } },
+        message: "Analysis started (Demo Mode)"
+      };
+    }
     return apiClient.post('/analyses', { imageId });
   },
 
@@ -253,6 +249,7 @@ export const analysisService = {
    * Delete an analysis
    */
   async deleteAnalysis(id: string): Promise<{ success: boolean; message: string }> {
+    if (import.meta.env.VITE_IS_DEMO === 'true') return { success: true, message: "Deleted (Demo)" };
     return apiClient.delete(`/analyses/${id}`);
   },
 
@@ -260,6 +257,7 @@ export const analysisService = {
    * Update analysis status
    */
   async updateAnalysisStatus(id: string, status: string): Promise<AnalysisResult> {
+    if (import.meta.env.VITE_IS_DEMO === 'true') return MOCK_ANALYSIS;
     return apiClient.patch(`/analyses/${id}`, { status });
   },
 
@@ -267,7 +265,12 @@ export const analysisService = {
    * Get user statistics
    */
   async getStatistics(userId: string): Promise<StatisticsResponse> {
+    if (import.meta.env.VITE_IS_DEMO === 'true') {
+      return {
+        success: true,
+        statistics: { totalAnalyses: 1, successRate: 100, thisMonth: 1, avgConfidence: 98.4, completedAnalyses: 1, failedAnalyses: 0, pendingAnalyses: 0 }
+      };
+    }
     return apiClient.get(`/analyses/user/${userId}/statistics`);
   },
 };
-

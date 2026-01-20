@@ -45,6 +45,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
+    // --- DEMO MODU BAŞLANGICI ---
+    // Eğer Vercel Environment Variables içinde VITE_IS_DEMO = true ise çalışır
+    if (import.meta.env.VITE_IS_DEMO === 'true') {
+      await new Promise(resolve => setTimeout(resolve, 800)); // Hafif bir bekleme hissi
+      
+      const demoUser: User = {
+        id: 'demo_user_123',
+        name: 'Demo User',
+        email: email || 'demo@medaix.com',
+        avatar: `https://ui-avatars.com/api/?name=Demo+User&background=0066CC&color=fff`,
+        memberSince: new Date().toISOString(),
+        bio: 'This is a demo account for showcase purposes.',
+      };
+
+      setCurrentUser(demoUser);
+      localStorage.setItem('medaix_user', JSON.stringify(demoUser));
+      return; // Fonksiyondan çık, aşağıdaki gerçek kontrolleri yapma
+    }
+    // --- DEMO MODU BİTİŞİ ---
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
