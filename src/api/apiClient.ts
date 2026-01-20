@@ -3,13 +3,10 @@
  * Handles communication with the backend API
  */
 
-// Demo mode check
+// Demo mode check - Vercel veya Local ayarlarına bakar
 export const isDemoMode = (): boolean => import.meta.env.VITE_IS_DEMO === 'true';
 
-// API Base URL - Environment-aware configuration for production and development
-// In production (Vercel), use Render backend URL
-// In development, use localhost:3001
-// In demo mode, use empty string to bypass backend
+// API Base URL yapılandırması
 const API_BASE_URL = isDemoMode() 
   ? '' 
   : (import.meta.env.VITE_API_URL || 'http://localhost:3001/api');
@@ -28,17 +25,26 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    
+    // --- DEMO MODU KRİTİK DÜZELTME ---
+    if (isDemoMode()) {
+      // Hata fırlatmak (throw error) yerine sessizce logluyoruz.
+      // Bu sayede 'Network Error' uyarısı çıkmaz ve uygulama MOCK verileri bekler.
+      console.log(`[Demo Mode Active] Bypassing real API call to: ${endpoint}`);
+      
+      // Servis katmanının (analysisService vb.) kendi demo verisini dönmesine izin vermek için 
+      // burada bir hata fırlatmadan resolve ediyoruz.
+      return Promise.resolve({} as T); 
+    }
+    // ---------------------------------
+
     const url = `${this.baseURL}${endpoint}`;
 
-    // Başlıkları (Headers) hazırlıyoruz
     const headers: Record<string, string> = { 
       ...(options.headers as Record<string, string>) 
     };
     
-    // KRİTİK DÜZELTME: 
-    // Eğer gönderilen veri FormData (resim) DEĞİLSE JSON başlığı ekle.
-    // Eğer resim gönderiliyorsa (FormData), tarayıcının kendi 'boundary' ayarını 
-    // yapabilmesi için Content-Type başlığını boş bırakıyoruz.
+    // FormData (resim) gönderilmiyorsa JSON başlığı ekle
     if (!(options.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
     }
@@ -47,11 +53,6 @@ class ApiClient {
       ...options,
       headers,
     };
-
-    // In demo mode, skip actual API calls
-    if (isDemoMode()) {
-      throw new Error('Demo mode: API calls are bypassed');
-    }
 
     try {
       const response = await fetch(url, config);
@@ -72,7 +73,7 @@ class ApiClient {
     }
   }
 
-  // Temel HTTP metodları
+  // HTTP Metodları
   async get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
@@ -93,7 +94,7 @@ class ApiClient {
     });
   }
 
-async patch<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
+  async patch<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
       method: 'PATCH',
