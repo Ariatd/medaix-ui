@@ -5,6 +5,17 @@ import { analysisService, type AnalysisResult } from '../api/analysisService';
 import { useToast } from '../context/ToastContext';
 import { toPercent, formatPercent } from '../utils/confidenceUtils';
 import { useAuth } from '../context/AuthContext';
+import { isDemoMode } from '../api/apiClient';
+
+// Demo badge component
+const DemoBadge: React.FC = () => (
+  <span className="inline-flex items-center gap-1 ml-2 px-2 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold">
+    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+    </svg>
+    Demo Mode
+  </span>
+);
 
 const History: React.FC = () => {
   const { currentUser } = useAuth();
@@ -18,6 +29,9 @@ const History: React.FC = () => {
   const { addToast } = useToast();
   const [sortBy, setSortBy] = useState('date');
   const itemsPerPage = 10;
+  
+  // Check if running in demo mode
+  const demoMode = isDemoMode();
 
   // Filters
   const [filters, setFilters] = useState({
@@ -205,7 +219,10 @@ const History: React.FC = () => {
             <>
               {/* Header - Responsive */}
               <div className="mb-6 sm:mb-8">
-                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white">Analysis History</h1>
+                <div className="flex items-center flex-wrap gap-2">
+                  <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white">Analysis History</h1>
+                  {demoMode && <DemoBadge />}
+                </div>
               </div>
 
               {/* Success Message */}

@@ -9,6 +9,7 @@ import ConfirmationModal from './ConfirmationModal';
 import { useToast } from '../context/ToastContext';
 import { uploadService } from '../api/uploadService';
 import { analysisService } from '../api/analysisService';
+import { isDemoMode } from '../api/apiClient';
 
 interface UploadCardProps {
   className?: string;
@@ -31,6 +32,9 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const ACCEPTED_FORMATS = ['.dcm', '.dicom', '.jpg', '.jpeg', '.png', '.tiff', '.tif'];
+
+  // Demo mode check
+  const isDemo = isDemoMode();
 
 
   const validateFile = useCallback(async (file: File) => {
@@ -122,6 +126,31 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
     setError(null);
 
     try {
+      // DEMO MODE: Simulate processing and redirect
+      if (isDemo) {
+        console.log('[UploadCard] Demo mode: Simulating analysis...');
+        
+        // Simulate processing delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Generate demo analysis ID
+        const demoAnalysisId = `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        console.log('[UploadCard] Demo mode: Analysis complete, redirecting to results');
+        
+        // Reset form
+        setSelectedFile(null);
+        setValidationResult(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        
+        // Navigate to results page with demo ID
+        navigate(`/results/${encodeURIComponent(demoAnalysisId)}`);
+        return;
+      }
+
+      // REAL MODE: Upload and process with backend
       // Upload the image to the backend
       const uploadResponse = await uploadService.uploadImage(selectedFile, currentUser.id);
 
@@ -218,7 +247,7 @@ const UploadCard: React.FC<UploadCardProps> = ({ className = '', onAnalysisCompl
     } finally {
       setIsAnalyzing(false);
     }
-  }, [selectedFile, currentUser?.id, validationResult, navigate]);
+  }, [selectedFile, currentUser?.id, validationResult, navigate, isDemo]);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + ' B';

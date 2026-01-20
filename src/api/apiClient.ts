@@ -3,10 +3,16 @@
  * Handles communication with the backend API
  */
 
+// Demo mode check
+export const isDemoMode = (): boolean => import.meta.env.VITE_IS_DEMO === 'true';
+
 // API Base URL - Environment-aware configuration for production and development
 // In production (Vercel), use Render backend URL
 // In development, use localhost:3001
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// In demo mode, use empty string to bypass backend
+const API_BASE_URL = isDemoMode() 
+  ? '' 
+  : (import.meta.env.VITE_API_URL || 'http://localhost:3001/api');
 
 /**
  * Generic API client class
@@ -41,6 +47,11 @@ class ApiClient {
       ...options,
       headers,
     };
+
+    // In demo mode, skip actual API calls
+    if (isDemoMode()) {
+      throw new Error('Demo mode: API calls are bypassed');
+    }
 
     try {
       const response = await fetch(url, config);
@@ -81,6 +92,7 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
+
 async patch<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,

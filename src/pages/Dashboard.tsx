@@ -8,6 +8,17 @@ import { useToast } from '../context/ToastContext';
 import { formatPercent, toPercent } from '../utils/confidenceUtils';
 import { useIsMobile, useIsTablet } from '../hooks/useDeviceType';
 import { useAuth } from '../context/AuthContext';
+import { isDemoMode } from '../api/apiClient';
+
+// Demo badge component
+const DemoBadge: React.FC = () => (
+  <span className="inline-flex items-center gap-1 ml-2 px-2 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold">
+    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+    </svg>
+    Demo Mode
+  </span>
+);
 
 interface DashboardStats {
   totalAnalyses: number;
@@ -32,6 +43,9 @@ const Dashboard: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Check if running in demo mode
+  const demoMode = isDemoMode();
 
   // Fetch analyses and statistics on mount
   useEffect(() => {
@@ -211,9 +225,12 @@ const Dashboard: React.FC = () => {
         <div className={`mx-auto ${maxWidthClass}`}>
           {/* Welcome Header - Responsive */}
           <div className="mb-8 sm:mb-12">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
-              Welcome back! 👋
-            </h1>
+            <div className="flex items-center flex-wrap gap-2">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
+                Welcome back! 👋
+              </h1>
+              {demoMode && <DemoBadge />}
+            </div>
             <p className="mt-2 text-sm sm:text-base text-gray-700 dark:text-gray-300">
               Here's what's happening with your analyses today
             </p>

@@ -76,6 +76,20 @@ const SAMPLE_DIFFERENTIAL = [
   ],
 ];
 
+// Demo mode configuration
+export const DEMO_MODE = {
+  isEnabled: (): boolean => import.meta.env.VITE_IS_DEMO === 'true',
+  stats: {
+    totalAnalyses: 120,
+    successRate: 98,
+    thisMonth: 45,
+    avgConfidence: 94,
+    completedAnalyses: 118,
+    failedAnalyses: 2,
+    pendingAnalyses: 0,
+  }
+};
+
 /**
  * Generate a single mock analysis
  */
@@ -87,7 +101,7 @@ function generateMockAnalysis(daysAgo: number): Analysis {
   const confidence = Math.floor(Math.random() * 26) + 70; // 70-95%
 
   return {
-    id: `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     date: date.toISOString(),
     imageName: SAMPLE_IMAGE_NAMES[Math.floor(Math.random() * SAMPLE_IMAGE_NAMES.length)],
     result: SAMPLE_RESULTS[Math.floor(Math.random() * SAMPLE_RESULTS.length)],
@@ -98,6 +112,84 @@ function generateMockAnalysis(daysAgo: number): Analysis {
     differentialDiagnosis: SAMPLE_DIFFERENTIAL[Math.floor(Math.random() * SAMPLE_DIFFERENTIAL.length)],
   };
 }
+
+/**
+ * Generate multiple mock analyses
+ */
+export const generateDemoAnalyses = (count: number = 10): Analysis[] => {
+  const analyses: Analysis[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const daysAgo = Math.floor(Math.random() * 30);
+    analyses.push(generateMockAnalysis(daysAgo));
+  }
+  
+  // Sort by date descending (most recent first)
+  analyses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  return analyses;
+};
+
+/**
+ * Get demo statistics
+ */
+export const getDemoStatistics = () => {
+  const analyses = generateDemoAnalyses(20);
+  const total = analyses.length;
+  const thisMonth = analyses.filter(a => {
+    const analysisDate = new Date(a.date);
+    const now = new Date();
+    return (
+      analysisDate.getMonth() === now.getMonth() &&
+      analysisDate.getFullYear() === now.getFullYear()
+    );
+  }).length;
+
+  const avgConfidence = total > 0
+    ? Math.round(analyses.reduce((sum, a) => sum + a.confidence, 0) / total)
+    : 0;
+
+  return {
+    totalAnalyses: 120,
+    thisMonth: 45,
+    successRate: 98,
+    avgConfidence: 94,
+  };
+};
+
+/**
+ * Generate mock analysis for dashboard Recent Analyses list
+ */
+export const getDemoRecentAnalyses = (): Analysis[] => {
+  return generateDemoAnalyses(5);
+};
+
+/**
+ * Generate mock analysis for Results page
+ */
+export const getDemoAnalysisResult = (id?: string): Analysis => {
+  const date = new Date();
+  const confidence = Math.floor(Math.random() * 26) + 70; // 70-95%
+  
+  return {
+    id: id || `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    date: date.toISOString(),
+    imageName: 'Chest_XRay_Demo.jpg',
+    result: SAMPLE_RESULTS[0],
+    confidence,
+    region: REGIONS[0],
+    modality: MODALITIES[0],
+    findings: SAMPLE_FINDINGS[0],
+    differentialDiagnosis: SAMPLE_DIFFERENTIAL[0],
+  };
+};
+
+/**
+ * Generate demo ID for new analysis
+ */
+export const generateDemoId = (): string => {
+  return `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+};
 
 /**
  * Generate mock data and initialize localStorage if needed

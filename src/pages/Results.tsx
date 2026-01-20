@@ -10,6 +10,17 @@ import { useToast } from '../context/ToastContext';
 import { toPercent, formatPercent } from '../utils/confidenceUtils';
 import { useAuth } from '../context/AuthContext';
 import type { ValidationResult } from '../utils/imageValidator';
+import { isDemoMode } from '../api/apiClient';
+
+// Demo badge component
+const DemoBadge: React.FC = () => (
+  <span className="inline-flex items-center gap-1 ml-2 px-2 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold">
+    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+    </svg>
+    Demo Mode
+  </span>
+);
 
 const Results: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +34,12 @@ const Results: React.FC = () => {
   const { addToast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Check if this is demo mode
+  const demoMode = isDemoMode();
+
+  // Check if this is a demo ID
+  const isDemoId = id?.startsWith('demo_') || id?.includes('demo');
 
   // Check if this is a new upload from navigation state
   const navigationData = location.state as {
@@ -41,7 +58,7 @@ const Results: React.FC = () => {
       return;
     }
 
-    // Handle existing analyses from database
+    // Handle existing analyses from database or demo mode
     if (!id) {
       setError('Missing analysis ID');
       setLoading(false);
@@ -51,6 +68,20 @@ const Results: React.FC = () => {
     const fetchAnalysis = async () => {
       try {
         console.log('[Results] Fetching analysis for id:', id);
+        
+        // In demo mode, show loading briefly then return mock data
+        if (demoMode || isDemoId) {
+          console.log('[Results] Demo mode detected, loading mock analysis');
+          await new Promise(resolve => setTimeout(resolve, 800)); // Brief loading for demo feel
+          
+          const mockAnalysis = await analysisService.getAnalysis(id);
+          console.log('[Results] Demo analysis loaded:', mockAnalysis.id);
+          setAnalysis(mockAnalysis);
+          setLoading(false);
+          return;
+        }
+        
+        // Real mode - fetch from API
         const response = await analysisService.getAnalysis(id);
         
         // CRITICAL FIX: API returns { success: true, analysis: {...} }
@@ -73,7 +104,7 @@ const Results: React.FC = () => {
 
     fetchAnalysis();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, navigationData]);
+  }, [id, navigationData, demoMode, isDemoId]);
 
     if (loading) {
     return (
@@ -111,7 +142,10 @@ const Results: React.FC = () => {
           <div className="mb-6 sm:mb-8">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <h1 className="mb-2 text-xl sm:text-2xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">Analysis Results</h1>
+                <div className="flex items-center flex-wrap gap-2">
+                  <h1 className="text-xl sm:text-2xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">Analysis Results</h1>
+                  {(demoMode || isDemoId) && <DemoBadge />}
+                </div>
                 <p className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 truncate">{analysis.image?.fileName || 'Unknown file'}</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">ID: {analysis.id.substring(0, 12)}...</p>
               </div>
