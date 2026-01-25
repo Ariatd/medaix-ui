@@ -506,9 +506,10 @@ const Landing: React.FC = () => {
                   color: 'success',
                 },
                 {
-                  value: '3 + 15',
+                  value: '3/3',
                   label: '3 Free Analysis/24h + 15 bounsu token (for sighn-up to Basic Plan)',
                   color: 'warning',
+                  progress: 100,
                 },
               ].map((stat, idx) => (
                 <motion.div
@@ -556,7 +557,7 @@ const Landing: React.FC = () => {
                             : 'from-orange-400 to-orange-600'
                         }`}
                         initial={{ width: '0%' }}
-                        animate={statsInView ? { width: `${(stat.value / 100) * 100}%` } : {}}
+                        animate={statsInView ? { width: `${(stat.progress !== undefined ? stat.progress : (typeof stat.value === 'number' ? stat.value : 0))}%` } : {}}
                         transition={{ duration: 2, delay: staggerDelay * idx, ease: 'easeOut' }}
                       />
                     </motion.div>
