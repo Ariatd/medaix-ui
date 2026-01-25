@@ -507,7 +507,7 @@ const Landing: React.FC = () => {
                 },
                 {
                   value: '3/24h',
-                  label: '3 Free Daily Analysis + 15 bounsu token (for sighn-up to Basic Plan)',
+                  label: '3 Free Daily Analysis',
                   color: 'warning',
                   progress: 100,
                 },
