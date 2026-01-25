@@ -506,9 +506,8 @@ const Landing: React.FC = () => {
                   color: 'success',
                 },
                 {
-                  value: usersCount,
-                  suffix: 'K+',
-                  label: 'Active Users',
+                  value: '3 + 15',
+                  label: '3 Free Analysis/24h + 15 bounsu token (for sighn-up to Basic Plan)',
                   color: 'warning',
                 },
               ].map((stat, idx) => (
