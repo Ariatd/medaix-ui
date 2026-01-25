@@ -393,7 +393,7 @@ const Landing: React.FC = () => {
                 Three Simple Steps
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300">
-                Get professional medical image analysis in minutes
+                Get professional medical image analysis in seconds
               </p>
             </motion.div>
 
