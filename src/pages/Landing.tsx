@@ -537,7 +537,7 @@ const Landing: React.FC = () => {
                       transition={{ duration: 2, delay: staggerDelay * idx }}
                     >
                       <div className="text-5xl sm:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-blue-600 dark:from-primary-400 dark:to-blue-400 mb-2">
-                        {stat.value}
+                        {stat.label === 'Accuracy Rate' ? '<90' : stat.value}
                         <span className="text-3xl sm:text-4xl">{stat.suffix}</span>
                       </div>
                     </motion.div>
