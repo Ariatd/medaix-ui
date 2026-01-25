@@ -39,7 +39,7 @@ const Landing: React.FC = () => {
   };
 
   // Count up values for stats
-  const accuracyCount = useCountUp(87, statsInView && !reduceMotion, 2);
+  const accuracyCount = useCountUp(90, statsInView && !reduceMotion, 2);
   const speedCount = useCountUp(450, statsInView && !reduceMotion, 2);
   const usersCount = useCountUp(12, statsInView && !reduceMotion, 2);
 
