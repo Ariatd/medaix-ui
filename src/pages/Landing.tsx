@@ -297,7 +297,7 @@ const Landing: React.FC = () => {
                 {
                   icon: 'lightning',
                   title: 'Lightning Fast',
-                  description: 'Get AI-powered analysis results in under 1 second',
+                  description: 'Get AI-powered analysis results in under 10 second',
                   direction: 'left',
                 },
                 {
